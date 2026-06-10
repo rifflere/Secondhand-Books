@@ -16,7 +16,7 @@ const search = async (req, res, next) => {
 
 const list = async (req, res, next) => {
   try {
-    const books = await shelfService.getShelf(req.query.sort);
+    const books = await shelfService.getShelf(req.user.id, req.query.sort);
     res.json(books);
   } catch (err) {
     next(err);
@@ -29,24 +29,20 @@ const save = async (req, res, next) => {
     if (!title) {
       return res.status(400).json({ error: 'Title is required' });
     }
-    const book = await shelfService.saveBook({ title, author, year, cover, pages, olKey });
+    const book = await shelfService.saveBook(req.user.id, { title, author, year, cover, pages, olKey });
     res.status(201).json(book);
   } catch (err) {
-    if (err.status) {
-      return res.status(err.status).json({ error: err.message });
-    }
+    if (err.status) return res.status(err.status).json({ error: err.message });
     next(err);
   }
 };
 
 const remove = async (req, res, next) => {
   try {
-    await shelfService.deleteBook(parseInt(req.params.id, 10));
+    await shelfService.deleteBook(req.user.id, parseInt(req.params.id, 10));
     res.status(204).send();
   } catch (err) {
-    if (err.status) {
-      return res.status(err.status).json({ error: err.message });
-    }
+    if (err.status) return res.status(err.status).json({ error: err.message });
     next(err);
   }
 };

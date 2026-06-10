@@ -1,7 +1,7 @@
 const booksRepository = require('../repositories/booksRepository');
 
-const getShelf = async (sortBy) => {
-  const rows = await booksRepository.findAll(sortBy);
+const getShelf = async (userId, sortBy) => {
+  const rows = await booksRepository.findAll(userId, sortBy);
   return rows.map((row) => ({
     id: row.id,
     olKey: row.external_id,
@@ -14,9 +14,9 @@ const getShelf = async (sortBy) => {
   }));
 };
 
-const saveBook = async (book) => {
+const saveBook = async (userId, book) => {
   if (book.olKey) {
-    const existing = await booksRepository.findByExternalId(book.olKey);
+    const existing = await booksRepository.findByExternalId(userId, book.olKey);
     if (existing) {
       const err = new Error('Book already on shelf');
       err.status = 409;
@@ -25,6 +25,7 @@ const saveBook = async (book) => {
   }
 
   const id = await booksRepository.create({
+    userId,
     externalId: book.olKey || null,
     title: book.title,
     author: book.author,
@@ -36,8 +37,8 @@ const saveBook = async (book) => {
   return { id, ...book };
 };
 
-const deleteBook = async (id) => {
-  const deleted = await booksRepository.remove(id);
+const deleteBook = async (userId, id) => {
+  const deleted = await booksRepository.remove(userId, id);
   if (!deleted) {
     const err = new Error('Book not found');
     err.status = 404;
