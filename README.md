@@ -105,11 +105,89 @@ Secondhand-Books/
 
 ## Troubleshooting
 
+**"Failed to initialize database: Server requests authentication using unknown plugin auth_gssapi_client"**
+
+`mysql2` doesn't support the GSSAPI auth plugin. You need to switch the root user to `mysql_native_password`. If you know your root password, connect and run:
+
+**MySQL 8+:**
+```sql
+ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';
+FLUSH PRIVILEGES;
+```
+
+**MariaDB:**
+```sql
+ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('your_password');
+FLUSH PRIVILEGES;
+```
+
+Then update `server/.env` with that password and re-run `dev.bat`.
+
+---
+
+**I don't know my root password (Windows)**
+
+You can reset it by starting the database in no-auth mode. Open a Command Prompt as Administrator.
+
+**1 — Find your mysqld path:**
+```
+where mysqld
+```
+It will print something like `C:\Program Files\MariaDB 11.x\bin\mysqld.exe`.
+
+**2 — Stop the database service:**
+
+Press Win+R, type `services.msc`, find **MariaDB** (or MySQL), right-click → **Stop**.
+
+**3 — Start mysqld with no auth (in your admin Command Prompt):**
+```
+"C:\Program Files\MariaDB 11.x\bin\mysqld.exe" --skip-grant-tables
+```
+Leave this window running — no prompt is returned, that's normal. The `feedback plugin` error that may appear is harmless.
+
+**4 — Connect in a second Command Prompt:**
+```
+"C:\Program Files\MariaDB 11.x\bin\mysql.exe" -u root
+```
+
+**5 — Reset the password:**
+```sql
+FLUSH PRIVILEGES;
+ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('');
+FLUSH PRIVILEGES;
+exit
+```
+> Use `IDENTIFIED VIA` on MariaDB. On MySQL 8+ use `IDENTIFIED WITH mysql_native_password BY ''` instead.
+
+**6 — Restore normal operation:**
+
+Go back to the admin Command Prompt running mysqld and press **Ctrl+C**. Then go to `services.msc` and **Start** the MariaDB/MySQL service again.
+
+**7 — Update `server/.env`:**
+```
+DB_PASSWORD=
+```
+Run `dev.bat` — database initialization should now succeed.
+
+---
+
+**I'd rather not change the root user**
+
+Create a dedicated app user instead:
+```sql
+CREATE USER 'books_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'choose_a_password';
+GRANT ALL PRIVILEGES ON secondhand_books.* TO 'books_user'@'localhost';
+FLUSH PRIVILEGES;
+```
+Then update `server/.env`: `DB_USER=books_user` and `DB_PASSWORD=choose_a_password`.
+
+---
+
 **"Search failed. Is the backend running?"**
 The backend isn't running. Make sure the backend terminal window opened by `dev.bat` shows `Server running on port 3001`.
 
 **"Could not load your shelf."**
-The backend can't reach MySQL. Check that MySQL is running and that your `server/.env` credentials are correct. Re-run `npm run db:init` in `server/` if the database hasn't been created yet.
+The backend can't reach MySQL. Check that MySQL is running and that your `server/.env` credentials are correct.
 
 **Port already in use**
 Change the backend port in `server/.env` (`PORT=3002`) and update the proxy target in `client/vite.config.js` to match.

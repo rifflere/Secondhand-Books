@@ -32,5 +32,14 @@ async function init() {
 
 init().catch((err) => {
   console.error('Failed to initialize database:', err.message);
+  if (err.message.includes('unknown plugin') || err.message.includes('auth_gssapi_client')) {
+    console.error(
+      '\nFix: mysql2 does not support the auth plugin your MySQL user is configured with.' +
+      '\nRun this in MySQL to switch to a supported auth method:' +
+      "\n  ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';" +
+      '\n  FLUSH PRIVILEGES;' +
+      '\nThen re-run: npm run db:init'
+    );
+  }
   process.exit(1);
 });
