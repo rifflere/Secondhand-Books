@@ -1,41 +1,16 @@
 import React, { useState } from 'react';
 import { formatDate } from '../utils/formatDate';
 
-const S = {
-  card: {
-    border: '1px solid #e5e7eb',
-    borderRadius: 8,
-    padding: 16,
-    display: 'flex',
-    gap: 16,
-    backgroundColor: '#fff',
-    boxShadow: '0 1px 3px rgba(0,0,0,0.06)',
-  },
-  noCover: {
-    width: 80, height: 120, borderRadius: 4,
-    backgroundColor: '#f3f4f6',
-    display: 'flex', alignItems: 'center', justifyContent: 'center',
-    fontSize: 11, color: '#9ca3af', textAlign: 'center', flexShrink: 0,
-  },
-  info: { flex: 1, display: 'flex', flexDirection: 'column', gap: 4, minWidth: 0 },
-  title: { margin: 0, fontSize: 16, fontWeight: 600, color: '#111827' },
-  author: { margin: 0, color: '#4b5563', fontSize: 14 },
-  meta: { marginTop: 'auto', fontSize: 12, color: '#9ca3af' },
-  actions: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', justifyContent: 'space-between', gap: 8, flexShrink: 0 },
-  deleteBtn: {
-    padding: '5px 12px', fontSize: 13, borderRadius: 5,
-    border: '1px solid #fca5a5', backgroundColor: '#fff', color: '#ef4444', cursor: 'pointer',
-  },
-  confirmRow: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 },
-  confirmText: { fontSize: 12, color: '#6b7280' },
-  confirmYes: {
-    padding: '4px 12px', fontSize: 13, borderRadius: 5,
-    border: 'none', backgroundColor: '#ef4444', color: '#fff', cursor: 'pointer',
-  },
-  confirmNo: {
-    padding: '4px 12px', fontSize: 13, borderRadius: 5,
-    border: '1px solid #d1d5db', backgroundColor: '#fff', color: '#374151', cursor: 'pointer',
-  },
+const C = {
+  card: '#FFF8EE',
+  border: '#D4B080',
+  text: '#2C1205',
+  muted: '#7D5540',
+  dimmed: '#A07858',
+  noCover: '#EDE0C8',
+  danger: '#8B1C1C',
+  dangerBorder: '#C49090',
+  confirmYesBg: '#8B1C1C',
 };
 
 export default function ShelfCard({ book, onDelete }) {
@@ -53,43 +28,96 @@ export default function ShelfCard({ book, onDelete }) {
   };
 
   return (
-    <div style={S.card}>
-      <div style={{ flexShrink: 0 }}>
+    <div style={{
+      backgroundColor: C.card, border: `1px solid ${C.border}`, borderRadius: 8,
+      overflow: 'hidden', display: 'flex', flexDirection: 'column',
+      boxShadow: '0 2px 8px rgba(44,18,5,0.10)',
+      transition: 'box-shadow 0.15s',
+    }}>
+      {/* Cover */}
+      <div style={{ position: 'relative', backgroundColor: C.noCover }}>
         {book.cover ? (
           <img
             src={book.cover}
             alt={`Cover of ${book.title}`}
-            style={{ width: 80, height: 120, objectFit: 'cover', borderRadius: 4 }}
+            style={{ width: '100%', aspectRatio: '2/3', objectFit: 'cover', display: 'block' }}
             onError={(e) => { e.target.style.display = 'none'; }}
           />
         ) : (
-          <div style={S.noCover}>No cover</div>
-        )}
-      </div>
-
-      <div style={S.info}>
-        <h3 style={S.title}>{book.title ?? 'Unknown Title'}</h3>
-        <p style={S.author}>{book.author ?? 'Unknown Author'}</p>
-        <p style={S.meta}>
-          {book.year && <span>{book.year}</span>}
-          {book.year && book.pages && <span style={{ margin: '0 6px' }}>·</span>}
-          {book.pages && <span>{book.pages} pages</span>}
-        </p>
-        <p style={{ ...S.meta, marginTop: 4 }}>Added {formatDate(book.addedAt)}</p>
-      </div>
-
-      <div style={S.actions}>
-        {!confirming ? (
-          <button style={S.deleteBtn} onClick={() => setConfirming(true)}>Remove</button>
-        ) : (
-          <div style={S.confirmRow}>
-            <span style={S.confirmText}>Remove from shelf?</span>
-            <button style={S.confirmYes} onClick={handleConfirmDelete} disabled={deleting}>
-              {deleting ? 'Removing…' : 'Yes, remove'}
-            </button>
-            <button style={S.confirmNo} onClick={() => setConfirming(false)}>Cancel</button>
+          <div style={{
+            width: '100%', aspectRatio: '2/3',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: 11, color: C.muted, textAlign: 'center', padding: 8,
+            fontStyle: 'italic',
+          }}>
+            No cover available
           </div>
         )}
+      </div>
+
+      {/* Info */}
+      <div style={{ padding: '10px 12px 12px', flex: 1, display: 'flex', flexDirection: 'column', gap: 3 }}>
+        <h3 style={{
+          margin: 0, fontSize: 13, fontWeight: 700, color: C.text,
+          fontFamily: 'Georgia, serif', lineHeight: 1.3,
+          overflow: 'hidden', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical',
+        }}>
+          {book.title ?? 'Unknown Title'}
+        </h3>
+        <p style={{ margin: 0, fontSize: 12, color: C.muted, fontStyle: 'italic' }}>
+          {book.author ?? 'Unknown Author'}
+        </p>
+        <p style={{ margin: '2px 0 0', fontSize: 11, color: C.dimmed }}>
+          {book.year && <span>{book.year}</span>}
+          {book.year && book.pages && <span style={{ margin: '0 4px' }}>·</span>}
+          {book.pages && <span>{book.pages}p</span>}
+        </p>
+        <p style={{ margin: '1px 0 0', fontSize: 10, color: C.dimmed }}>
+          Added {formatDate(book.addedAt)}
+        </p>
+
+        {/* Delete action */}
+        <div style={{ marginTop: 8 }}>
+          {!confirming ? (
+            <button
+              onClick={() => setConfirming(true)}
+              style={{
+                padding: '3px 10px', fontSize: 11, borderRadius: 4,
+                border: `1px solid ${C.dangerBorder}`, backgroundColor: 'transparent',
+                color: C.danger, cursor: 'pointer', fontFamily: 'Georgia, serif',
+              }}
+            >
+              Remove
+            </button>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
+              <span style={{ fontSize: 11, color: C.muted, fontStyle: 'italic' }}>Remove from shelf?</span>
+              <div style={{ display: 'flex', gap: 5 }}>
+                <button
+                  onClick={handleConfirmDelete}
+                  disabled={deleting}
+                  style={{
+                    flex: 1, padding: '3px 0', fontSize: 11, borderRadius: 4,
+                    border: 'none', backgroundColor: C.confirmYesBg,
+                    color: '#FFF8EE', cursor: 'pointer', fontFamily: 'Georgia, serif',
+                  }}
+                >
+                  {deleting ? '…' : 'Yes'}
+                </button>
+                <button
+                  onClick={() => setConfirming(false)}
+                  style={{
+                    flex: 1, padding: '3px 0', fontSize: 11, borderRadius: 4,
+                    border: `1px solid ${C.border}`, backgroundColor: 'transparent',
+                    color: C.muted, cursor: 'pointer', fontFamily: 'Georgia, serif',
+                  }}
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

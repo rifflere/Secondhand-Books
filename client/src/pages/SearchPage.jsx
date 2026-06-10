@@ -3,6 +3,15 @@ import BookCard from '../components/BookCard';
 import { useSearch } from '../hooks/useSearch';
 import { saveBook } from '../services/bookService';
 
+const C = {
+  text: '#2C1205',
+  muted: '#7D5540',
+  border: '#D4B080',
+  primary: '#8B1C1C',
+  input: '#FFF8EE',
+  error: '#8B1C1C',
+};
+
 export default function SearchPage() {
   const { query, setQuery, results, loading, error, search } = useSearch();
   const [saveStatuses, setSaveStatuses] = useState({});
@@ -27,6 +36,10 @@ export default function SearchPage() {
 
   return (
     <div>
+      <h2 style={{ margin: '0 0 20px', fontSize: 22, color: C.text, fontFamily: 'Georgia, serif' }}>
+        Search Books
+      </h2>
+
       <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
         <input
           type="text"
@@ -34,32 +47,37 @@ export default function SearchPage() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by title…"
           style={{
-            flex: 1, padding: '8px 12px', fontSize: 15,
-            borderRadius: 6, border: '1px solid #d1d5db', outline: 'none',
+            flex: 1, padding: '9px 14px', fontSize: 15,
+            borderRadius: 6, border: `1px solid ${C.border}`,
+            backgroundColor: C.input, color: C.text,
+            fontFamily: 'Georgia, serif', outline: 'none',
           }}
         />
         <button
           type="submit"
           disabled={loading}
           style={{
-            padding: '8px 18px', fontSize: 15, borderRadius: 6,
-            border: 'none', backgroundColor: '#2563eb', color: '#fff',
-            cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.7 : 1,
+            padding: '9px 20px', fontSize: 15, borderRadius: 6,
+            border: 'none', fontFamily: 'Georgia, serif',
+            backgroundColor: loading ? '#C4766B' : C.primary,
+            color: '#FFF8EE', cursor: loading ? 'default' : 'pointer',
           }}
         >
           {loading ? 'Searching…' : 'Search'}
         </button>
       </form>
 
-      {error && <p style={{ color: '#dc2626', marginBottom: 16 }}>{error}</p>}
+      {error && (
+        <p style={{ color: C.error, fontStyle: 'italic', fontSize: 14, marginBottom: 16 }}>{error}</p>
+      )}
 
       {results && !loading && (
-        <p style={{ color: '#6b7280', marginBottom: 16, fontSize: 14 }}>
+        <p style={{ color: C.muted, fontSize: 13, marginBottom: 16, fontStyle: 'italic' }}>
           {results.totalResults.toLocaleString()} results for "{results.searchTerm}"
         </p>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
         {results?.books.map((book, i) => {
           const key = book.olKey || book.title;
           return (
