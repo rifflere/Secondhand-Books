@@ -20,6 +20,7 @@ const searchBooks = async (searchTerm) => {
 const normalizeBook = (doc) => {
   const coverId = doc.cover_i ?? null;
   return {
+    olKey: doc.key || null,
     title: doc.title || null,
     author: doc.author_name?.[0] || null,
     year: doc.first_publish_year || null,
