@@ -1,0 +1,6 @@
+# Copy this file to terraform.tfvars and fill in your values.
+# NEVER commit terraform.tfvars to git — it contains your DB password.
+
+region              = "us-east-1"
+db_password         = "pick-something-strong-at-least-12-chars"
+ssh_public_key_path = "~/.ssh/secondhand-books.pub"
