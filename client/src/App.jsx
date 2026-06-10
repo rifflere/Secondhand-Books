@@ -18,7 +18,7 @@ function Nav() {
   return (
     <header className="nav">
       <div className="nav-inner">
-        <span className="nav-brand">📚 Secondhand Books</span>
+        <span className="nav-brand">Secondhand Books</span>
         {user && (
           <nav className="nav-links">
             <NavLink

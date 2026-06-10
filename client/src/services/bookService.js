@@ -5,8 +5,11 @@ export const searchBooks = async (query) => {
   return data;
 };
 
-export const getShelf = async (sort) => {
-  const { data } = await api.get('/books', { params: sort ? { sort } : {} });
+export const getShelf = async (sort, dir) => {
+  const params = {};
+  if (sort) params.sort = sort;
+  if (dir) params.dir = dir;
+  const { data } = await api.get('/books', { params });
   return data;
 };
 

@@ -6,11 +6,11 @@ export function useShelf() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const load = useCallback(async (sort) => {
+  const load = useCallback(async (sort, dir) => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getShelf(sort);
+      const data = await getShelf(sort, dir);
       setBooks(data);
     } catch {
       setError('Could not load your shelf.');

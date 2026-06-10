@@ -16,7 +16,7 @@ const search = async (req, res, next) => {
 
 const list = async (req, res, next) => {
   try {
-    const books = await shelfService.getShelf(req.user.id, req.query.sort);
+    const books = await shelfService.getShelf(req.user.id, req.query.sort, req.query.dir);
     res.json(books);
   } catch (err) {
     next(err);

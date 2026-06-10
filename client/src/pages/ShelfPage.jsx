@@ -10,14 +10,30 @@ const SORTS = [
   { value: 'title', label: 'Title' },
 ];
 
+const DEFAULT_DIR = { date: 'desc', title: 'asc' };
+
 export default function ShelfPage() {
   const { books, loading, error, deleteBook, reload } = useShelf();
   const [sortBy, setSortBy] = useState('date');
+  const [sortDir, setSortDir] = useState('desc');
   const [deleteError, setDeleteError] = useState(null);
 
-  const handleSort = (sort) => {
-    setSortBy(sort);
-    reload(sort);
+  const handleSort = (key) => {
+    if (key === sortBy) {
+      const newDir = sortDir === 'desc' ? 'asc' : 'desc';
+      setSortDir(newDir);
+      reload(key, newDir);
+    } else {
+      const newDir = DEFAULT_DIR[key];
+      setSortBy(key);
+      setSortDir(newDir);
+      reload(key, newDir);
+    }
+  };
+
+  const sortArrow = (key) => {
+    if (key !== sortBy) return '';
+    return sortDir === 'asc' ? ' ↑' : ' ↓';
   };
 
   const handleDelete = async (id) => {
@@ -47,7 +63,7 @@ export default function ShelfPage() {
               className={`sort-btn${sortBy === value ? ' sort-btn--active' : ''}`}
               onClick={() => handleSort(value)}
             >
-              {label}
+              {label}{sortArrow(value)}
             </button>
           ))}
         </div>

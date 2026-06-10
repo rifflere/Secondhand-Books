@@ -1,7 +1,7 @@
 const booksRepository = require('../repositories/booksRepository');
 
-const getShelf = async (userId, sortBy) => {
-  const rows = await booksRepository.findAll(userId, sortBy);
+const getShelf = async (userId, sortBy, sortDir) => {
+  const rows = await booksRepository.findAll(userId, sortBy, sortDir);
   return rows.map((row) => ({
     id: row.id,
     olKey: row.external_id,

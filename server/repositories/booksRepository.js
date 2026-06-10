@@ -1,13 +1,12 @@
 const pool = require('../config/database');
 
-const SORT_OPTIONS = {
-  title: 'title ASC',
-  date: 'created_at DESC',
-};
-
-const findAll = async (userId, sortBy = 'date') => {
-  const order = SORT_OPTIONS[sortBy] || SORT_OPTIONS.date;
-  const [rows] = await pool.query(`SELECT * FROM books WHERE user_id = ? ORDER BY ${order}`, [userId]);
+const findAll = async (userId, sortBy = 'date', sortDir = 'desc') => {
+  const col = sortBy === 'title' ? 'title' : 'created_at';
+  const dir = sortDir === 'asc' ? 'ASC' : 'DESC';
+  const [rows] = await pool.query(
+    `SELECT * FROM books WHERE user_id = ? ORDER BY ${col} ${dir}`,
+    [userId]
+  );
   return rows;
 };
 

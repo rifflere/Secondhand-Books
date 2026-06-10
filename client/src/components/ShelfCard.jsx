@@ -16,7 +16,7 @@ export default function ShelfCard({ book, onDelete }) {
   };
 
   return (
-    <div className="shelf-card">
+    <div className={`shelf-card shelf-card--spine-${book.id % 5}`}>
       <div className="shelf-card-cover">
         {book.cover ? (
           <img
