@@ -30,7 +30,7 @@ export default function SearchPage() {
   const showPopular = results === null && !loading;
 
   return (
-    <div>
+    <div className="main-content">
       <h2 className="page-heading">Search Books</h2>
 
       <form className="search-form" onSubmit={handleSubmit}>
@@ -92,4 +92,5 @@ export default function SearchPage() {
       )}
     </div>
   );
+}
 }

@@ -1,10 +1,14 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, NavLink, useNavigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, NavLink, Link, useNavigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import Footer from './components/Footer';
 import SearchPage from './pages/SearchPage';
 import ShelfPage from './pages/ShelfPage';
 import LoginPage from './pages/LoginPage';
+import LandingPage from './pages/LandingPage';
+import DashboardPage from './pages/DashboardPage';
+import AboutPage from './pages/AboutPage';
 
 function Nav() {
   const { user, logout } = useAuth();
@@ -12,50 +16,56 @@ function Nav() {
 
   const handleLogout = () => {
     logout();
-    navigate('/login');
+    navigate('/');
   };
+
+  const linkClass = ({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`;
 
   return (
     <header className="nav">
       <div className="nav-inner">
-        <span className="nav-brand">Secondhand Books</span>
-        {user && (
-          <nav className="nav-links">
-            <NavLink
-              to="/"
-              end
-              className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
-            >
-              Search
-            </NavLink>
-            <NavLink
-              to="/shelf"
-              className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''}`}
-            >
-              My Shelf
-            </NavLink>
-            <span className="nav-divider">|</span>
-            <span className="nav-username">{user.username}</span>
-            <button className="nav-signout" onClick={handleLogout}>Sign out</button>
-          </nav>
-        )}
+        <Link to="/" className="nav-brand">Secondhand Books</Link>
+        <nav className="nav-links">
+          {user ? (
+            <>
+              <NavLink to="/search" className={linkClass}>Search</NavLink>
+              <NavLink to="/shelf" className={linkClass}>My Shelf</NavLink>
+              <NavLink to="/about" className={linkClass}>About</NavLink>
+              <span className="nav-divider">|</span>
+              <span className="nav-username">{user.username}</span>
+              <button className="nav-signout" onClick={handleLogout}>Sign out</button>
+            </>
+          ) : (
+            <>
+              <NavLink to="/about" className={linkClass}>About</NavLink>
+              <NavLink to="/login" className="nav-link nav-link--cta">Sign In</NavLink>
+            </>
+          )}
+        </nav>
       </div>
     </header>
   );
 }
 
-function Layout() {
+function HomePage() {
   const { user } = useAuth();
+  return user ? <DashboardPage /> : <LandingPage />;
+}
+
+function Layout() {
   return (
     <div className="app-shell">
-      {user && <Nav />}
-      <main className="main-content">
+      <Nav />
+      <main className="site-main">
         <Routes>
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
-          <Route path="/shelf" element={<ProtectedRoute><ShelfPage /></ProtectedRoute>} />
+          <Route path="/"       element={<HomePage />} />
+          <Route path="/about"  element={<AboutPage />} />
+          <Route path="/login"  element={<LoginPage />} />
+          <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
+          <Route path="/shelf"  element={<ProtectedRoute><ShelfPage /></ProtectedRoute>} />
         </Routes>
       </main>
+      <Footer />
     </div>
   );
 }

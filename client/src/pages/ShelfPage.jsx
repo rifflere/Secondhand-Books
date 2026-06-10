@@ -51,7 +51,7 @@ export default function ShelfPage() {
   }
 
   return (
-    <div>
+    <div className="main-content">
       <BookshelfGraphic />
 
       <div className="shelf-toolbar">
