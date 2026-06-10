@@ -3,15 +3,6 @@ import BookCard from '../components/BookCard';
 import { useSearch } from '../hooks/useSearch';
 import { saveBook } from '../services/bookService';
 
-const C = {
-  text: '#2C1205',
-  muted: '#7D5540',
-  border: '#D4B080',
-  primary: '#8B1C1C',
-  input: '#FFF8EE',
-  error: '#8B1C1C',
-};
-
 export default function SearchPage() {
   const { query, setQuery, results, loading, error, search } = useSearch();
   const [saveStatuses, setSaveStatuses] = useState({});
@@ -36,48 +27,30 @@ export default function SearchPage() {
 
   return (
     <div>
-      <h2 style={{ margin: '0 0 20px', fontSize: 22, color: C.text, fontFamily: 'Georgia, serif' }}>
-        Search Books
-      </h2>
+      <h2 className="page-heading">Search Books</h2>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 8, marginBottom: 24 }}>
+      <form className="search-form" onSubmit={handleSubmit}>
         <input
+          className="search-input"
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search by title…"
-          style={{
-            flex: 1, padding: '9px 14px', fontSize: 15,
-            borderRadius: 6, border: `1px solid ${C.border}`,
-            backgroundColor: C.input, color: C.text,
-            fontFamily: 'Georgia, serif', outline: 'none',
-          }}
         />
-        <button
-          type="submit"
-          disabled={loading}
-          style={{
-            padding: '9px 20px', fontSize: 15, borderRadius: 6,
-            border: 'none', fontFamily: 'Georgia, serif',
-            backgroundColor: loading ? '#C4766B' : C.primary,
-            color: '#FFF8EE', cursor: loading ? 'default' : 'pointer',
-          }}
-        >
+        <button className="search-btn" type="submit" disabled={loading}>
           {loading ? 'Searching…' : 'Search'}
         </button>
       </form>
 
-      {error && (
-        <p style={{ color: C.error, fontStyle: 'italic', fontSize: 14, marginBottom: 16 }}>{error}</p>
-      )}
+      {error && <p className="search-error">{error}</p>}
 
       {results && !loading && (
-        <p style={{ color: C.muted, fontSize: 13, marginBottom: 16, fontStyle: 'italic' }}>
+        <p className="search-meta">
           {results.totalResults.toLocaleString()} results for "{results.searchTerm}"
         </p>
       )}
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+      <div className="search-results">
         {results?.books.map((book, i) => {
           const key = book.olKey || book.title;
           return (
