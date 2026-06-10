@@ -1,10 +1,22 @@
 import axios from 'axios';
 
-const api = axios.create({
-  baseURL: '/api',
-});
+const api = axios.create({ baseURL: '/api' });
 
 export const searchBooks = async (query) => {
   const { data } = await api.get('/books/search', { params: { q: query } });
   return data;
+};
+
+export const getShelf = async (sort) => {
+  const { data } = await api.get('/books', { params: sort ? { sort } : {} });
+  return data;
+};
+
+export const saveBook = async (book) => {
+  const { data } = await api.post('/books', book);
+  return data;
+};
+
+export const deleteBook = async (id) => {
+  await api.delete(`/books/${id}`);
 };
