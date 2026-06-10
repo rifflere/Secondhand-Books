@@ -1,5 +1,10 @@
 import api from './api';
 
+export const getPopularBooks = async () => {
+  const { data } = await api.get('/books/popular');
+  return data;
+};
+
 export const searchBooks = async (query) => {
   const { data } = await api.get('/books/search', { params: { q: query } });
   return data;

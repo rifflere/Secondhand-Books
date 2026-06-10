@@ -7,7 +7,7 @@ const SAVE_LABEL = {
   error:     'Retry',
 };
 
-export default function BookCard({ book, onSave, saveStatus }) {
+export default function BookCard({ book, onSave, saveStatus, saveCount }) {
   const { title, author, year, cover, pages } = book;
   const status = saveStatus || 'default';
   const isDisabled = status === 'saving' || status === 'saved' || status === 'duplicate';
@@ -34,6 +34,11 @@ export default function BookCard({ book, onSave, saveStatus }) {
           {year && pages && <span> · </span>}
           {pages && <span>{pages} pages</span>}
         </p>
+        {saveCount > 0 && (
+          <p className="book-card-popularity">
+            Saved by {saveCount} {saveCount === 1 ? 'reader' : 'readers'}
+          </p>
+        )}
       </div>
 
       {onSave && (

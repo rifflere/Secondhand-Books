@@ -1,6 +1,15 @@
 const openLibraryService = require('../services/openLibraryService');
 const shelfService = require('../services/shelfService');
 
+const popular = async (req, res, next) => {
+  try {
+    const books = await shelfService.getPopular();
+    res.json(books);
+  } catch (err) {
+    next(err);
+  }
+};
+
 const search = async (req, res, next) => {
   try {
     const { q } = req.query;
@@ -47,4 +56,4 @@ const remove = async (req, res, next) => {
   }
 };
 
-module.exports = { search, list, save, remove };
+module.exports = { popular, search, list, save, remove };

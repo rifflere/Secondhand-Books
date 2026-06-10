@@ -1,5 +1,18 @@
 const booksRepository = require('../repositories/booksRepository');
 
+const getPopular = async () => {
+  const rows = await booksRepository.findPopular(10);
+  return rows.map((row) => ({
+    olKey: row.external_id,
+    title: row.title,
+    author: row.author,
+    year: row.publication_year,
+    cover: row.cover_url,
+    pages: row.pages,
+    saveCount: row.save_count,
+  }));
+};
+
 const getShelf = async (userId, sortBy, sortDir) => {
   const rows = await booksRepository.findAll(userId, sortBy, sortDir);
   return rows.map((row) => ({
@@ -46,4 +59,4 @@ const deleteBook = async (userId, id) => {
   }
 };
 
-module.exports = { getShelf, saveBook, deleteBook };
+module.exports = { getPopular, getShelf, saveBook, deleteBook };
