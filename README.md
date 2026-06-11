@@ -1,13 +1,132 @@
 # Secondhand Books
 
-A full-stack web app for searching books via the Open Library API, saving them to named shelves, connecting with reading buddies, and managing your account.
+A full-stack web app for tracking books you want to read, have read, or just love. Search the Open Library catalogue, save books to named shelves, connect with reading buddies, and manage your account.
 
-## Prerequisites
+**Live at:** [secondhand-books.ddns.net](http://secondhand-books.ddns.net)
+
+![Dashboard](docs/screenshots/dashboard.png)
+
+---
+
+## Features
+
+- **Search** the Open Library catalogue by title; browse what's most-saved across all readers
+- **Named shelves** — create as many shelves as you like, toggle them public or private, rename and delete them
+- **Save to a specific shelf** directly from search results
+- **Book Buddies** — find other users, send buddy requests, and browse each other's public shelves
+- **Activity feed** — see what your buddies have been saving lately
+- **Account recovery** — forgot your username or password? Get help via email from the login page
+- **Account page** — view your stats, and delete your account if you ever need to
+
+---
+
+## User Guide
+
+### Creating an account
+
+Go to [secondhand-books.ddns.net](http://secondhand-books.ddns.net) and click **Sign In** in the top-right, then switch to the **Create Account** tab.
+
+You'll need:
+- A **username** (shown publicly to buddies)
+- An **email address** (used only for account recovery — never shown to other users)
+- A **password** (at least 6 characters)
+
+![Create account form](docs/screenshots/register.png)
+
+---
+
+### Searching for books
+
+Click **Search** in the nav bar. Type a title and hit Search, or browse the **What's Popular** section to see what other readers are saving.
+
+![Search results](docs/screenshots/search.png)
+
+Each result card shows the cover, author, year, page count, and how many readers have saved it. Click **Save to Shelf** to pick which of your shelves to add it to.
+
+---
+
+### Managing your shelves
+
+Click **My Shelves** in the nav bar.
+
+![Shelves page](docs/screenshots/shelves.png)
+
+**Tabs across the top** — each tab is one of your shelves. The number in brackets is the book count.
+
+**Creating a shelf** — type a name into the **+ New Shelf** field at the end of the tab row and press Enter.
+
+**Renaming** — click the **Rename** button in the shelf toolbar. Type the new name and press Enter or click Save.
+
+**Public / Private toggle** — click **Public** or **Private** in the toolbar to control who can see the shelf. Private shelves are visible only to you — they don't appear in buddy views, the activity feed, or the popular books list.
+
+**Deleting a shelf** — click **Delete** in the toolbar. A warning will show you how many books are on the shelf. Books that exist only on the deleted shelf are permanently removed; books that also live on another shelf are kept.
+
+**Adding a book to another shelf** — on any book card on your shelf, click **+ Shelf** to see a dropdown of your other shelves and add the book there too.
+
+**Removing a book** — click the **×** on a book card. If the book is on other shelves it stays there; if it was only on this shelf it's removed from your library entirely.
+
+**Sorting** — use the sort controls above the book grid to sort by Date Added or Title, ascending or descending.
+
+---
+
+### Book Buddies
+
+Click **Buddies** in the nav bar.
+
+![Buddies page](docs/screenshots/buddies.png)
+
+**Finding someone** — type a username into the search box. Results show the relationship status alongside each user (no relationship, request sent, request received, or already buddies).
+
+**Sending a request** — click **Add Buddy** on a search result. They'll see a badge on their Buddies nav link when the request arrives.
+
+**Accepting / declining** — incoming requests appear at the top of the Buddies page. Click **Accept** or **Decline**.
+
+**Viewing a buddy's shelves** — click a buddy's name or avatar to open their shelf view. You'll see all their public shelves and the books on them (read-only).
+
+**Removing a buddy** — click **Remove** on any accepted buddy to unfriend them.
+
+---
+
+### Activity feed
+
+The **Dashboard** (home page when signed in) shows a feed of books your buddies have recently added to their public shelves, plus a row of buddy avatars linking to their shelves.
+
+![Dashboard feed](docs/screenshots/dashboard.png)
+
+---
+
+### Account page
+
+Click your **username** in the nav bar to open your account page.
+
+![Account page](docs/screenshots/account.png)
+
+Here you can see:
+- Your username and the date you joined
+- Stats: total books saved, shelves created, and buddies
+- A **Delete Account** option — this permanently removes your account, all your books and shelves, and disconnects you from all buddy lists. You'll be asked to type your username to confirm before anything is deleted.
+
+---
+
+### Recovering your account
+
+On the Sign In page, click **Forgot username or password?** to expand the recovery panel.
+
+![Account recovery](docs/screenshots/recovery.png)
+
+- **Get my username** — enter your email and we'll send your username to that address
+- **Reset my password** — enter your username and email; if they match we'll send a reset link (valid for 1 hour)
+
+> Recovery emails are sent to the address you registered with. The link in the email takes you to a page where you can set a new password.
+
+---
+
+## Local Setup
+
+### Prerequisites
 
 - [Node.js](https://nodejs.org/) v18 or higher
 - [MySQL](https://dev.mysql.com/downloads/mysql/) 8.0 or MariaDB (must be running locally)
-
-## Local Setup
 
 ### 1. Install dependencies
 
@@ -21,7 +140,7 @@ cd server && npm install && cd ../client && npm install && cd ..
 copy server\.env.example server\.env
 ```
 
-Edit `server/.env` with your MySQL credentials and a JWT secret:
+Edit `server/.env`:
 
 ```
 PORT=3001
@@ -34,9 +153,6 @@ JWT_SECRET=generate_a_long_random_string
 
 # Used in password-reset email links — keep as localhost for dev
 APP_URL=http://localhost:5173
-
-# Optional: real SMTP for email sending (see .env.example for all fields)
-# Without SMTP, recovery emails print to the server console instead.
 ```
 
 Generate a JWT secret:
@@ -60,7 +176,7 @@ Double-click `dev.bat` or run it from a terminal:
 dev.bat
 ```
 
-Opens two terminals — one for the backend (port 3001), one for the frontend (port 5173).
+Opens two terminals — backend on port 3001, frontend on port 5173.
 
 | Service  | URL                    |
 |----------|------------------------|
@@ -69,67 +185,91 @@ Opens two terminals — one for the backend (port 3001), one for the frontend (p
 
 ---
 
-## Features
-
-- **Search** books by title via the Open Library API; browse what's popular across all readers
-- **Named shelves** — create multiple shelves per account, toggle public/private, rename, delete with orphan-book cleanup
-- **Save to shelf** — pick which shelf directly from the search results
-- **Book Buddies** — find users by username, send/accept buddy requests; accepted buddies can view each other's public shelves
-- **Activity feed** — see what books your buddies have saved recently
-- **Account management** — view stats (books, shelves, buddies), joined date, delete account with confirmation
-- **Account recovery** — forgot username (email lookup) or forgot password (email reset link) from the login page
-
----
-
 ## Project Structure
 
 ```
 Secondhand-Books/
-├── dev.bat                       # Windows dev launcher (opens two terminals)
-├── server/                       # Express API (Node.js, CommonJS)
+├── dev.bat                           # Windows dev launcher
+├── deploy/
+│   ├── upload.ps1                    # Builds frontend + SCPs everything to EC2
+│   ├── server-setup.sh               # One-time EC2 setup reference
+│   └── nginx.conf                    # Nginx config (static frontend + API proxy)
+├── terraform/                        # AWS infrastructure (EC2 + RDS)
+├── server/                           # Express API — CommonJS, MVC pattern
 │   ├── config/
-│   │   ├── database.js           # mysql2 connection pool
-│   │   └── init-db.js            # idempotent DB + table setup / migrations
-│   ├── controllers/              # HTTP layer only (validate → service → respond)
-│   │   ├── authController.js
-│   │   ├── booksController.js
-│   │   ├── shelvesController.js
-│   │   ├── buddiesController.js
-│   │   ├── usersController.js
-│   │   └── accountController.js
-│   ├── services/                 # Business logic
-│   │   ├── authService.js
-│   │   ├── shelfService.js       # book save/delete (main shelf logic)
-│   │   ├── shelvesService.js     # multi-shelf CRUD
-│   │   ├── buddiesService.js
-│   │   ├── emailService.js       # nodemailer (falls back to console.log in dev)
-│   │   ├── accountService.js
-│   │   └── openLibraryService.js
-│   ├── repositories/             # DB access only (raw SQL)
+│   │   ├── database.js               # mysql2 connection pool
+│   │   └── init-db.js                # Idempotent schema setup + migrations
+│   ├── middleware/
+│   │   ├── authenticate.js           # JWT verification → req.user
+│   │   ├── requireAdmin.js           # Admin-only gate (checks req.user.isAdmin)
+│   │   └── errorHandler.js
+│   ├── repositories/                 # Raw SQL — one file per domain
 │   │   ├── usersRepository.js
 │   │   ├── booksRepository.js
 │   │   ├── shelvesRepository.js
 │   │   ├── buddiesRepository.js
 │   │   └── resetTokensRepository.js
+│   ├── services/                     # Business logic
+│   │   ├── authService.js
+│   │   ├── shelfService.js           # Book save/delete (core shelf logic)
+│   │   ├── shelvesService.js         # Multi-shelf CRUD
+│   │   ├── buddiesService.js
+│   │   ├── adminService.js
+│   │   ├── accountService.js
+│   │   ├── emailService.js           # Nodemailer (console.log fallback in dev)
+│   │   └── openLibraryService.js
+│   ├── controllers/                  # HTTP layer: validate → call service → respond
+│   │   ├── authController.js
+│   │   ├── booksController.js
+│   │   ├── shelvesController.js
+│   │   ├── buddiesController.js
+│   │   ├── usersController.js
+│   │   ├── accountController.js
+│   │   └── adminController.js
 │   ├── routes/
 │   │   ├── auth.js
 │   │   ├── books.js
 │   │   ├── shelves.js
 │   │   ├── buddies.js
 │   │   ├── users.js
-│   │   └── account.js
-│   ├── middleware/
-│   │   ├── authenticate.js       # JWT verification → req.user
-│   │   └── errorHandler.js
+│   │   ├── account.js
+│   │   └── admin.js
 │   └── index.js
-└── client/                       # React + Vite (ES modules)
+└── client/                           # React + Vite — ES modules
     └── src/
-        ├── components/           # BookCard, ShelfCard, ReadOnlyShelfCard, etc.
-        ├── pages/                # One component per route
-        ├── hooks/                # useSearch, usePopular, useShelves, useBuddies
-        ├── services/             # axios wrappers (api.js + per-domain files)
-        └── context/
-            └── AuthContext.jsx   # user + token stored in localStorage
+        ├── context/
+        │   └── AuthContext.jsx       # user + token in localStorage
+        ├── components/
+        │   ├── BookCard.jsx          # Search result card with shelf picker
+        │   ├── ShelfCard.jsx         # Saved book card with add-to-shelf dropdown
+        │   ├── ReadOnlyShelfCard.jsx # Buddy shelf view (no edit controls)
+        │   ├── ProtectedRoute.jsx
+        │   └── Footer.jsx
+        ├── pages/
+        │   ├── LandingPage.jsx
+        │   ├── LoginPage.jsx         # Sign in + register + account recovery
+        │   ├── DashboardPage.jsx     # Activity feed + buddy avatars
+        │   ├── SearchPage.jsx
+        │   ├── ShelvesPage.jsx       # Full shelf management UI
+        │   ├── BuddiesPage.jsx       # Search users, manage requests + buddies
+        │   ├── BuddyShelvesPage.jsx  # Read-only view of a buddy's shelves
+        │   ├── AccountPage.jsx       # Stats + delete account
+        │   ├── ResetPasswordPage.jsx # Password reset via emailed token
+        │   ├── AdminPage.jsx         # User list + public shelves (admin only)
+        │   └── AboutPage.jsx
+        ├── hooks/
+        │   ├── useSearch.js
+        │   ├── usePopular.js
+        │   ├── useShelves.js
+        │   └── useBuddies.js
+        └── services/                 # Axios wrappers — one file per domain
+            ├── api.js                # Base axios instance with auth interceptor
+            ├── authService.js
+            ├── bookService.js
+            ├── shelvesService.js
+            ├── buddiesService.js
+            ├── accountService.js
+            └── adminService.js
 ```
 
 ---
@@ -138,170 +278,157 @@ Secondhand-Books/
 
 ### Auth (`/api/auth`)
 
-| Method | Path                        | Auth | Description                                  |
-|--------|-----------------------------|------|----------------------------------------------|
-| POST   | `/register`                 | —    | Create account (username, email, password)   |
-| POST   | `/login`                    | —    | Sign in (username + password)                |
-| POST   | `/recover`                  | —    | Email username or password-reset link        |
-| GET    | `/validate-token/:token`    | —    | Check if a reset token is still valid        |
-| POST   | `/reset-password`           | —    | Set new password using a valid reset token   |
+| Method | Path                     | Auth | Description                                |
+|--------|--------------------------|------|--------------------------------------------|
+| POST   | `/register`              | —    | Create account (username, email, password) |
+| POST   | `/login`                 | —    | Sign in — returns JWT + user object        |
+| POST   | `/recover`               | —    | Email username or password-reset link      |
+| GET    | `/validate-token/:token` | —    | Check if a reset token is still valid      |
+| POST   | `/reset-password`        | —    | Set new password using a reset token       |
 
 ### Books (`/api/books`)
 
-| Method | Path           | Auth | Description                           |
-|--------|----------------|------|---------------------------------------|
-| GET    | `/popular`     | —    | Most-saved books across all users     |
-| GET    | `/search?q=`   | —    | Search Open Library by title          |
-| GET    | `/`            | ✓    | List user's books (`sort`, `dir`)     |
-| POST   | `/`            | ✓    | Save a book (optionally to `shelfId`) |
-| DELETE | `/:id`         | ✓    | Remove a book                         |
+| Method | Path         | Auth | Description                            |
+|--------|--------------|------|----------------------------------------|
+| GET    | `/popular`   | —    | Most-saved books (public shelves only) |
+| GET    | `/search?q=` | —    | Search Open Library by title           |
+| GET    | `/`          | ✓    | List user's books (`sort`, `dir`)      |
+| POST   | `/`          | ✓    | Save a book (optionally to `shelfId`)  |
+| DELETE | `/:id`       | ✓    | Remove a book                          |
 
 ### Shelves (`/api/shelves`)
 
-| Method | Path                    | Auth | Description                       |
-|--------|-------------------------|------|-----------------------------------|
-| GET    | `/`                     | ✓    | List all shelves for current user |
-| POST   | `/`                     | ✓    | Create a shelf                    |
-| PATCH  | `/:id`                  | ✓    | Rename or toggle public/private   |
-| DELETE | `/:id`                  | ✓    | Delete shelf + orphan books       |
-| GET    | `/:id/books`            | ✓    | List books on a shelf             |
-| POST   | `/:id/books`            | ✓    | Add a book to a shelf             |
-| DELETE | `/:id/books/:bookId`    | ✓    | Remove a book from a shelf        |
+| Method | Path                  | Auth | Description                        |
+|--------|-----------------------|------|------------------------------------|
+| GET    | `/`                   | ✓    | All shelves for current user       |
+| POST   | `/`                   | ✓    | Create a shelf                     |
+| PATCH  | `/:id`                | ✓    | Rename or toggle public/private    |
+| DELETE | `/:id`                | ✓    | Delete shelf + orphan book cleanup |
+| GET    | `/:id/books`          | ✓    | Books on a shelf                   |
+| POST   | `/:id/books`          | ✓    | Add a book to a shelf              |
+| DELETE | `/:id/books/:bookId`  | ✓    | Remove a book from a shelf         |
 
 ### Buddies (`/api/buddies`)
 
-| Method | Path                    | Auth | Description                         |
-|--------|-------------------------|------|-------------------------------------|
-| GET    | `/search?q=`            | ✓    | Search users by username            |
-| GET    | `/feed`                 | ✓    | Recent activity from buddies        |
-| GET    | `/requests/incoming`    | ✓    | Pending requests received           |
-| GET    | `/requests/outgoing`    | ✓    | Pending requests sent               |
-| GET    | `/`                     | ✓    | List accepted buddies               |
-| POST   | `/request`              | ✓    | Send a buddy request                |
-| PATCH  | `/:id`                  | ✓    | Accept or decline a request         |
-| DELETE | `/:id`                  | ✓    | Remove a buddy                      |
+| Method | Path                  | Auth | Description                      |
+|--------|-----------------------|------|----------------------------------|
+| GET    | `/search?q=`          | ✓    | Search users by username         |
+| GET    | `/feed`               | ✓    | Recent activity from buddies     |
+| GET    | `/requests/incoming`  | ✓    | Pending requests received        |
+| GET    | `/requests/outgoing`  | ✓    | Pending requests sent            |
+| GET    | `/`                   | ✓    | Accepted buddies                 |
+| POST   | `/request`            | ✓    | Send a buddy request             |
+| PATCH  | `/:id`                | ✓    | Accept or decline a request      |
+| DELETE | `/:id`                | ✓    | Remove a buddy                   |
 
 ### Users (`/api/users`)
 
-| Method | Path                                  | Auth | Description                        |
-|--------|---------------------------------------|------|------------------------------------|
-| GET    | `/:username/shelves`                  | ✓    | Public shelves for a buddy         |
-| GET    | `/:username/shelves/:shelfId/books`   | ✓    | Books on a buddy's public shelf    |
+| Method | Path                                | Auth | Description                     |
+|--------|-------------------------------------|------|---------------------------------|
+| GET    | `/:username/shelves`                | ✓    | A buddy's public shelves        |
+| GET    | `/:username/shelves/:shelfId/books` | ✓    | Books on a buddy's public shelf |
 
 ### Account (`/api/account`)
 
-| Method | Path      | Auth | Description                                  |
-|--------|-----------|------|----------------------------------------------|
-| GET    | `/stats`  | ✓    | Books, shelves, buddies count + join date    |
-| DELETE | `/`       | ✓    | Delete account (cascades everything)         |
+| Method | Path     | Auth | Description                           |
+|--------|----------|------|---------------------------------------|
+| GET    | `/stats` | ✓    | Books, shelves, buddies count + dates |
+| DELETE | `/`      | ✓    | Delete account (cascades everything)  |
+
+### Admin (`/api/admin`) — admin token required
+
+| Method | Path                  | Auth        | Description                  |
+|--------|-----------------------|-------------|------------------------------|
+| GET    | `/users`              | ✓ + admin   | All users with stats         |
+| GET    | `/shelves`            | ✓ + admin   | All public shelves           |
+| PATCH  | `/users/:id/admin`    | ✓ + admin   | Grant or revoke admin        |
+| DELETE | `/users/:id`          | ✓ + admin   | Delete a user                |
 
 ---
 
 ## Deployment
 
-See [DEPLOYMENT.md](./DEPLOYMENT.md) for full instructions. The app runs on AWS Free Tier (EC2 + RDS) managed by Terraform.
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full instructions (Terraform setup, first-time EC2 config, tear-down).
 
-Quick redeploy after code changes:
+**Quick redeploy after code changes:**
 
 ```powershell
-# Upload code
 .\deploy\upload.ps1 -IP <EC2_IP>
+```
 
-# SSH in, then:
+Then SSH in and run on the server:
+
+```bash
 cd /var/www/secondhand-books/server
-npm install --omit=dev   # run when package.json changed
-npm run db:init          # run when init-db.js changed (always safe to re-run)
+npm install --omit=dev          # only when package.json changed
+npm run db:init                 # only when init-db.js changed (safe to re-run)
 pm2 restart secondhand-books
+sudo chmod -R o+rX /var/www/secondhand-books/client/dist
 ```
 
 ---
 
 ## Troubleshooting
 
-**"Email is required" when registering**  
-The register form now requires an email address for account recovery. It's only used for password resets — you never sign in with it.
+**500 Internal Server Error after deploy**
+nginx lost read permissions on the dist folder. Run:
+```bash
+sudo chmod -R o+rX /var/www/secondhand-books/client/dist
+```
+Confirm with: `sudo tail /var/log/nginx/error.log` — look for `Permission denied`.
 
-**Recovery emails not arriving**  
-Without SMTP configured, emails print to the server console (`pm2 logs secondhand-books` on the server, or the backend terminal locally). The reset link in the log is fully functional — you can copy and open it.
+**"Email is required" when registering**
+The register form now requires an email address for account recovery. It's never shown to other users or used for sign-in.
 
-**"Failed to initialize database: Server requests authentication using unknown plugin auth_gssapi_client"**
+**Recovery emails not arriving**
+Without SMTP configured, emails print to the server console (`pm2 logs secondhand-books`). The reset link in the log is fully functional — copy and open it directly.
 
-`mysql2` doesn't support the GSSAPI auth plugin. Switch the root user to `mysql_native_password`.
+**"Failed to initialize database: unknown plugin auth_gssapi_client"**
+
+Switch the MySQL root user to `mysql_native_password`:
 
 *MySQL 8+:*
 ```sql
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';
 FLUSH PRIVILEGES;
 ```
-
 *MariaDB:*
 ```sql
 ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('your_password');
 FLUSH PRIVILEGES;
 ```
-
-Then update `server/.env` with that password and re-run `dev.bat`.
-
----
+Update `server/.env` and re-run `dev.bat`.
 
 **I don't know my root password (Windows)**
 
-Reset it by starting the database in no-auth mode. Open a Command Prompt as Administrator.
+Reset it in no-auth mode. Open Command Prompt as Administrator.
 
-**1 — Find your mysqld path:**
-```
-where mysqld
-```
-It will print something like `C:\Program Files\MariaDB 11.x\bin\mysqld.exe`.
-
-**2 — Stop the database service:**
-
-Press Win+R → `services.msc` → find MariaDB/MySQL → right-click → Stop.
-
-**3 — Start mysqld with no auth (admin Command Prompt):**
-```
-"C:\Program Files\MariaDB 11.x\bin\mysqld.exe" --skip-grant-tables
-```
-Leave this window running.
-
-**4 — Connect in a second Command Prompt:**
-```
-"C:\Program Files\MariaDB 11.x\bin\mysql.exe" -u root
-```
-
-**5 — Reset the password:**
+1. `where mysqld` — note the path
+2. Stop the database service: Win+R → `services.msc` → MariaDB/MySQL → Stop
+3. Start with no auth: `"C:\...\mysqld.exe" --skip-grant-tables` (leave running)
+4. Connect: `"C:\...\mysql.exe" -u root`
+5. Reset:
 ```sql
 FLUSH PRIVILEGES;
 ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('');
 FLUSH PRIVILEGES;
 exit
 ```
-
-**6 — Restore normal operation:**
-
-Ctrl+C the mysqld window, then start the service again in `services.msc`.
-
-**7 — Update `server/.env`:** set `DB_PASSWORD=` (empty) and re-run `dev.bat`.
-
----
+6. Ctrl+C the mysqld window, restart the service, update `server/.env` with `DB_PASSWORD=`.
 
 **I'd rather not change the root user**
-
-Create a dedicated app user instead:
 ```sql
 CREATE USER 'books_user'@'localhost' IDENTIFIED WITH mysql_native_password BY 'choose_a_password';
 GRANT ALL PRIVILEGES ON secondhand_books.* TO 'books_user'@'localhost';
 FLUSH PRIVILEGES;
 ```
-Then update `server/.env`: `DB_USER=books_user` and `DB_PASSWORD=choose_a_password`.
+Then set `DB_USER=books_user` and `DB_PASSWORD=choose_a_password` in `server/.env`.
 
----
+**"Search failed. Is the backend running?"**
+The backend isn't running. Make sure the backend terminal opened by `dev.bat` shows `Server running on port 3001`.
 
-**"Search failed. Is the backend running?"**  
-Make sure the backend terminal opened by `dev.bat` shows `Server running on port 3001`.
+**"Could not load your shelf."**
+The backend can't reach MySQL. Check that MySQL is running and `server/.env` credentials are correct.
 
-**"Could not load your shelf."**  
-The backend can't reach MySQL. Check that MySQL is running and your `server/.env` credentials are correct.
-
-**Port already in use**  
-Change the backend port in `server/.env` (`PORT=3002`) and update the proxy target in `client/vite.config.js` to match.
+**Port already in use**
+Change `PORT=3002` in `server/.env` and update the proxy target in `client/vite.config.js` to match.
