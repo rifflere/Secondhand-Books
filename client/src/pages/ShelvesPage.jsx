@@ -146,7 +146,6 @@ export default function ShelvesPage() {
     <div className="main-content">
       <BookshelfGraphic />
 
-      {/* Shelf tabs */}
       <div className="shelf-tabs">
         {!shelvesLoading && shelves.map((s) => (
           <button
@@ -179,7 +178,6 @@ export default function ShelvesPage() {
         )}
       </div>
 
-      {/* Active shelf toolbar */}
       {activeShelf && (
         <div className="shelf-toolbar">
           <div className="shelf-toolbar-left">
@@ -211,24 +209,19 @@ export default function ShelvesPage() {
                   >
                     Rename
                   </button>
-                  {!activeShelf.isDefault && !confirmDelete && (
-                    <button className="shelf-meta-btn shelf-meta-btn--danger" onClick={() => setConfirmDelete(true)}>
+                  {!activeShelf.isDefault && (
+                    <button
+                      className="shelf-meta-btn shelf-meta-btn--danger"
+                      onClick={() => { setConfirmDelete(true); setEditingShelf(false); }}
+                    >
                       Delete
                     </button>
-                  )}
-                  {confirmDelete && (
-                    <span className="shelf-confirm-inline">
-                      Delete shelf?&nbsp;
-                      <button className="shelf-confirm-yes" onClick={handleDeleteShelf}>Yes</button>
-                      <button className="shelf-confirm-cancel" onClick={() => setConfirmDelete(false)}>No</button>
-                    </span>
                   )}
                 </div>
               </div>
             )}
             {actionError && <p className="shelf-action-error">{actionError}</p>}
           </div>
-
           <div className="shelf-sort">
             {SORTS.map(({ value, label }) => (
               <button
@@ -239,6 +232,30 @@ export default function ShelvesPage() {
                 {label}{sortArrow(value)}
               </button>
             ))}
+          </div>
+        </div>
+      )}
+
+      {confirmDelete && activeShelf && (
+        <div className="shelf-delete-warning">
+          <div className="shelf-delete-warning-icon">!</div>
+          <div className="shelf-delete-warning-body">
+            <p className="shelf-delete-warning-title">
+              Delete &ldquo;{activeShelf.name}&rdquo;?
+            </p>
+            <p className="shelf-delete-warning-text">
+              {activeShelf.bookCount > 0
+                ? `This shelf has ${activeShelf.bookCount} book${activeShelf.bookCount === 1 ? '' : 's'}. Any books saved only here will be permanently removed from your collection.`
+                : 'This shelf is empty and will be permanently deleted.'}
+            </p>
+            <div className="shelf-delete-warning-actions">
+              <button className="shelf-delete-confirm-btn" onClick={handleDeleteShelf}>
+                Delete forever
+              </button>
+              <button className="shelf-delete-cancel-btn" onClick={() => setConfirmDelete(false)}>
+                Cancel
+              </button>
+            </div>
           </div>
         </div>
       )}

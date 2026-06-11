@@ -1692,6 +1692,79 @@ button, input {
   margin-top: 4px;
 }
 
+/* Delete shelf warning banner */
+.shelf-delete-warning {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: #fef2f2;
+  border: 1px solid #fca5a5;
+  border-radius: var(--r-lg);
+  padding: 16px 20px;
+  margin: 8px 0 4px;
+}
+.shelf-delete-warning-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--c-primary);
+  color: #fff;
+  font-weight: 900;
+  font-size: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.shelf-delete-warning-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.shelf-delete-warning-title {
+  font-weight: 700;
+  font-size: 15px;
+  color: #991b1b;
+}
+.shelf-delete-warning-text {
+  font-size: 13px;
+  color: #7f1d1d;
+  line-height: 1.5;
+}
+.shelf-delete-warning-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+.shelf-delete-confirm-btn {
+  padding: 8px 18px;
+  background: var(--c-primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.shelf-delete-confirm-btn:hover { background: var(--c-primary-hover); }
+.shelf-delete-cancel-btn {
+  padding: 8px 16px;
+  background: #fff;
+  border: 1px solid #fca5a5;
+  border-radius: var(--r-md);
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 600;
+  color: #991b1b;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.shelf-delete-cancel-btn:hover { background: #fef2f2; }
+
 /* ==========================================================================
    ShelfCard: "Add to shelf" dropdown
    ========================================================================== */
