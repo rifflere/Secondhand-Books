@@ -1,29 +1,27 @@
-# SecondHand Books
+# Secondhand Books
 
-A full-stack web app for searching books via the Open Library API and saving them to a personal shelf.
+A full-stack web app for searching books via the Open Library API, saving them to named shelves, connecting with reading buddies, and managing your account.
 
 ## Prerequisites
 
 - [Node.js](https://nodejs.org/) v18 or higher
-- [MySQL](https://dev.mysql.com/downloads/mysql/) 8.0 or higher (must be running locally)
+- [MySQL](https://dev.mysql.com/downloads/mysql/) 8.0 or MariaDB (must be running locally)
 
 ## Local Setup
 
 ### 1. Install dependencies
 
-```
+```powershell
 cd server && npm install && cd ../client && npm install && cd ..
 ```
 
 ### 2. Configure the database
 
-Copy the example env file and fill in your MySQL credentials:
-
-```
+```powershell
 copy server\.env.example server\.env
 ```
 
-Edit `server/.env`:
+Edit `server/.env` with your MySQL credentials and a JWT secret:
 
 ```
 PORT=3001
@@ -32,90 +30,211 @@ DB_PORT=3306
 DB_USER=root
 DB_PASSWORD=your_mysql_password
 DB_NAME=secondhand_books
+JWT_SECRET=generate_a_long_random_string
+
+# Used in password-reset email links — keep as localhost for dev
+APP_URL=http://localhost:5173
+
+# Optional: real SMTP for email sending (see .env.example for all fields)
+# Without SMTP, recovery emails print to the server console instead.
+```
+
+Generate a JWT secret:
+```powershell
+node -e "console.log(require('crypto').randomBytes(48).toString('hex'))"
 ```
 
 ### 3. Initialize the database
 
-This creates the `secondhand_books` database and the `books` table if they don't exist:
+Creates all tables and runs any pending migrations. Safe to re-run.
 
-```
+```powershell
 cd server && npm run db:init && cd ..
 ```
 
 ### 4. Start the app
 
-Double-click `dev.bat` in the project root, or run it from a terminal:
+Double-click `dev.bat` or run it from a terminal:
 
-```
+```powershell
 dev.bat
 ```
 
-This opens two terminal windows — one for the backend, one for the frontend — with a short delay so the server is ready first.
+Opens two terminals — one for the backend (port 3001), one for the frontend (port 5173).
 
-| Service  | URL                   |
-|----------|-----------------------|
+| Service  | URL                    |
+|----------|------------------------|
 | Frontend | http://localhost:5173  |
 | Backend  | http://localhost:3001  |
-
-Open [http://localhost:5173](http://localhost:5173) in your browser.
 
 ---
 
 ## Features
 
-- **Search** books by title via the Open Library API
-- **Save** books to your personal shelf (duplicates are prevented)
-- **View shelf** with sort by date added or title
-- **Remove** books from your shelf (with confirmation)
+- **Search** books by title via the Open Library API; browse what's popular across all readers
+- **Named shelves** — create multiple shelves per account, toggle public/private, rename, delete with orphan-book cleanup
+- **Save to shelf** — pick which shelf directly from the search results
+- **Book Buddies** — find users by username, send/accept buddy requests; accepted buddies can view each other's public shelves
+- **Activity feed** — see what books your buddies have saved recently
+- **Account management** — view stats (books, shelves, buddies), joined date, delete account with confirmation
+- **Account recovery** — forgot username (email lookup) or forgot password (email reset link) from the login page
+
+---
 
 ## Project Structure
 
 ```
 Secondhand-Books/
-├── dev.bat                   # Windows dev launcher
-├── server/                   # Express API (Node.js)
+├── dev.bat                       # Windows dev launcher (opens two terminals)
+├── server/                       # Express API (Node.js, CommonJS)
 │   ├── config/
-│   │   ├── database.js       # mysql2 connection pool
-│   │   └── init-db.js        # one-time DB + table setup
-│   ├── controllers/          # HTTP request/response only
-│   ├── services/             # business logic
-│   │   ├── openLibraryService.js
-│   │   └── shelfService.js
-│   ├── repositories/         # database access
+│   │   ├── database.js           # mysql2 connection pool
+│   │   └── init-db.js            # idempotent DB + table setup / migrations
+│   ├── controllers/              # HTTP layer only (validate → service → respond)
+│   │   ├── authController.js
+│   │   ├── booksController.js
+│   │   ├── shelvesController.js
+│   │   ├── buddiesController.js
+│   │   ├── usersController.js
+│   │   └── accountController.js
+│   ├── services/                 # Business logic
+│   │   ├── authService.js
+│   │   ├── shelfService.js       # book save/delete (main shelf logic)
+│   │   ├── shelvesService.js     # multi-shelf CRUD
+│   │   ├── buddiesService.js
+│   │   ├── emailService.js       # nodemailer (falls back to console.log in dev)
+│   │   ├── accountService.js
+│   │   └── openLibraryService.js
+│   ├── repositories/             # DB access only (raw SQL)
+│   │   ├── usersRepository.js
+│   │   ├── booksRepository.js
+│   │   ├── shelvesRepository.js
+│   │   ├── buddiesRepository.js
+│   │   └── resetTokensRepository.js
 │   ├── routes/
+│   │   ├── auth.js
+│   │   ├── books.js
+│   │   ├── shelves.js
+│   │   ├── buddies.js
+│   │   ├── users.js
+│   │   └── account.js
 │   ├── middleware/
+│   │   ├── authenticate.js       # JWT verification → req.user
+│   │   └── errorHandler.js
 │   └── index.js
-└── client/                   # React + Vite frontend
+└── client/                       # React + Vite (ES modules)
     └── src/
-        ├── components/       # BookCard, ShelfCard
-        ├── pages/            # SearchPage, ShelfPage
-        ├── hooks/            # useSearch, useShelf
-        ├── services/         # bookService (axios)
-        └── utils/
+        ├── components/           # BookCard, ShelfCard, ReadOnlyShelfCard, etc.
+        ├── pages/                # One component per route
+        ├── hooks/                # useSearch, usePopular, useShelves, useBuddies
+        ├── services/             # axios wrappers (api.js + per-domain files)
+        └── context/
+            └── AuthContext.jsx   # user + token stored in localStorage
 ```
+
+---
 
 ## API Reference
 
-| Method | Endpoint             | Description                        |
-|--------|----------------------|------------------------------------|
-| GET    | /api/books/search?q= | Search Open Library by title       |
-| GET    | /api/books           | List saved shelf (sort=date\|title) |
-| POST   | /api/books           | Save a book to shelf               |
-| DELETE | /api/books/:id       | Remove a book from shelf           |
+### Auth (`/api/auth`)
+
+| Method | Path                        | Auth | Description                                  |
+|--------|-----------------------------|------|----------------------------------------------|
+| POST   | `/register`                 | —    | Create account (username, email, password)   |
+| POST   | `/login`                    | —    | Sign in (username + password)                |
+| POST   | `/recover`                  | —    | Email username or password-reset link        |
+| GET    | `/validate-token/:token`    | —    | Check if a reset token is still valid        |
+| POST   | `/reset-password`           | —    | Set new password using a valid reset token   |
+
+### Books (`/api/books`)
+
+| Method | Path           | Auth | Description                           |
+|--------|----------------|------|---------------------------------------|
+| GET    | `/popular`     | —    | Most-saved books across all users     |
+| GET    | `/search?q=`   | —    | Search Open Library by title          |
+| GET    | `/`            | ✓    | List user's books (`sort`, `dir`)     |
+| POST   | `/`            | ✓    | Save a book (optionally to `shelfId`) |
+| DELETE | `/:id`         | ✓    | Remove a book                         |
+
+### Shelves (`/api/shelves`)
+
+| Method | Path                    | Auth | Description                       |
+|--------|-------------------------|------|-----------------------------------|
+| GET    | `/`                     | ✓    | List all shelves for current user |
+| POST   | `/`                     | ✓    | Create a shelf                    |
+| PATCH  | `/:id`                  | ✓    | Rename or toggle public/private   |
+| DELETE | `/:id`                  | ✓    | Delete shelf + orphan books       |
+| GET    | `/:id/books`            | ✓    | List books on a shelf             |
+| POST   | `/:id/books`            | ✓    | Add a book to a shelf             |
+| DELETE | `/:id/books/:bookId`    | ✓    | Remove a book from a shelf        |
+
+### Buddies (`/api/buddies`)
+
+| Method | Path                    | Auth | Description                         |
+|--------|-------------------------|------|-------------------------------------|
+| GET    | `/search?q=`            | ✓    | Search users by username            |
+| GET    | `/feed`                 | ✓    | Recent activity from buddies        |
+| GET    | `/requests/incoming`    | ✓    | Pending requests received           |
+| GET    | `/requests/outgoing`    | ✓    | Pending requests sent               |
+| GET    | `/`                     | ✓    | List accepted buddies               |
+| POST   | `/request`              | ✓    | Send a buddy request                |
+| PATCH  | `/:id`                  | ✓    | Accept or decline a request         |
+| DELETE | `/:id`                  | ✓    | Remove a buddy                      |
+
+### Users (`/api/users`)
+
+| Method | Path                                  | Auth | Description                        |
+|--------|---------------------------------------|------|------------------------------------|
+| GET    | `/:username/shelves`                  | ✓    | Public shelves for a buddy         |
+| GET    | `/:username/shelves/:shelfId/books`   | ✓    | Books on a buddy's public shelf    |
+
+### Account (`/api/account`)
+
+| Method | Path      | Auth | Description                                  |
+|--------|-----------|------|----------------------------------------------|
+| GET    | `/stats`  | ✓    | Books, shelves, buddies count + join date    |
+| DELETE | `/`       | ✓    | Delete account (cascades everything)         |
+
+---
+
+## Deployment
+
+See [DEPLOYMENT.md](./DEPLOYMENT.md) for full instructions. The app runs on AWS Free Tier (EC2 + RDS) managed by Terraform.
+
+Quick redeploy after code changes:
+
+```powershell
+# Upload code
+.\deploy\upload.ps1 -IP <EC2_IP>
+
+# SSH in, then:
+cd /var/www/secondhand-books/server
+npm install --omit=dev   # run when package.json changed
+npm run db:init          # run when init-db.js changed (always safe to re-run)
+pm2 restart secondhand-books
+```
+
+---
 
 ## Troubleshooting
 
+**"Email is required" when registering**  
+The register form now requires an email address for account recovery. It's only used for password resets — you never sign in with it.
+
+**Recovery emails not arriving**  
+Without SMTP configured, emails print to the server console (`pm2 logs secondhand-books` on the server, or the backend terminal locally). The reset link in the log is fully functional — you can copy and open it.
+
 **"Failed to initialize database: Server requests authentication using unknown plugin auth_gssapi_client"**
 
-`mysql2` doesn't support the GSSAPI auth plugin. You need to switch the root user to `mysql_native_password`. If you know your root password, connect and run:
+`mysql2` doesn't support the GSSAPI auth plugin. Switch the root user to `mysql_native_password`.
 
-**MySQL 8+:**
+*MySQL 8+:*
 ```sql
 ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'your_password';
 FLUSH PRIVILEGES;
 ```
 
-**MariaDB:**
+*MariaDB:*
 ```sql
 ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWORD('your_password');
 FLUSH PRIVILEGES;
@@ -127,7 +246,7 @@ Then update `server/.env` with that password and re-run `dev.bat`.
 
 **I don't know my root password (Windows)**
 
-You can reset it by starting the database in no-auth mode. Open a Command Prompt as Administrator.
+Reset it by starting the database in no-auth mode. Open a Command Prompt as Administrator.
 
 **1 — Find your mysqld path:**
 ```
@@ -137,13 +256,13 @@ It will print something like `C:\Program Files\MariaDB 11.x\bin\mysqld.exe`.
 
 **2 — Stop the database service:**
 
-Press Win+R, type `services.msc`, find **MariaDB** (or MySQL), right-click → **Stop**.
+Press Win+R → `services.msc` → find MariaDB/MySQL → right-click → Stop.
 
-**3 — Start mysqld with no auth (in your admin Command Prompt):**
+**3 — Start mysqld with no auth (admin Command Prompt):**
 ```
 "C:\Program Files\MariaDB 11.x\bin\mysqld.exe" --skip-grant-tables
 ```
-Leave this window running — no prompt is returned, that's normal. The `feedback plugin` error that may appear is harmless.
+Leave this window running.
 
 **4 — Connect in a second Command Prompt:**
 ```
@@ -157,17 +276,12 @@ ALTER USER 'root'@'localhost' IDENTIFIED VIA mysql_native_password USING PASSWOR
 FLUSH PRIVILEGES;
 exit
 ```
-> Use `IDENTIFIED VIA` on MariaDB. On MySQL 8+ use `IDENTIFIED WITH mysql_native_password BY ''` instead.
 
 **6 — Restore normal operation:**
 
-Go back to the admin Command Prompt running mysqld and press **Ctrl+C**. Then go to `services.msc` and **Start** the MariaDB/MySQL service again.
+Ctrl+C the mysqld window, then start the service again in `services.msc`.
 
-**7 — Update `server/.env`:**
-```
-DB_PASSWORD=
-```
-Run `dev.bat` — database initialization should now succeed.
+**7 — Update `server/.env`:** set `DB_PASSWORD=` (empty) and re-run `dev.bat`.
 
 ---
 
@@ -183,11 +297,11 @@ Then update `server/.env`: `DB_USER=books_user` and `DB_PASSWORD=choose_a_passwo
 
 ---
 
-**"Search failed. Is the backend running?"**
-The backend isn't running. Make sure the backend terminal window opened by `dev.bat` shows `Server running on port 3001`.
+**"Search failed. Is the backend running?"**  
+Make sure the backend terminal opened by `dev.bat` shows `Server running on port 3001`.
 
-**"Could not load your shelf."**
-The backend can't reach MySQL. Check that MySQL is running and that your `server/.env` credentials are correct.
+**"Could not load your shelf."**  
+The backend can't reach MySQL. Check that MySQL is running and your `server/.env` credentials are correct.
 
-**Port already in use**
+**Port already in use**  
 Change the backend port in `server/.env` (`PORT=3002`) and update the proxy target in `client/vite.config.js` to match.
