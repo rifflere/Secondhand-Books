@@ -1,9 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { formatDate } from '../utils/formatDate';
 
-export default function ShelfCard({ book, onDelete }) {
+export default function ShelfCard({ book, onDelete, allShelves, currentShelfId, onAddToShelf }) {
   const [confirming, setConfirming] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [showShelfMenu, setShowShelfMenu] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setShowShelfMenu(false);
+      }
+    };
+    if (showShelfMenu) document.addEventListener('mousedown', handleOutsideClick);
+    return () => document.removeEventListener('mousedown', handleOutsideClick);
+  }, [showShelfMenu]);
 
   const handleConfirmDelete = async () => {
     setDeleting(true);
@@ -46,7 +58,7 @@ export default function ShelfCard({ book, onDelete }) {
             </button>
           ) : (
             <div className="shelf-confirm">
-              <span className="shelf-confirm-text">Remove from shelf?</span>
+              <span className="shelf-confirm-text">Remove?</span>
               <div className="shelf-confirm-actions">
                 <button
                   className="shelf-confirm-yes"
@@ -59,9 +71,42 @@ export default function ShelfCard({ book, onDelete }) {
                   className="shelf-confirm-cancel"
                   onClick={() => setConfirming(false)}
                 >
-                  Cancel
+                  No
                 </button>
               </div>
+            </div>
+          )}
+
+          {onAddToShelf && allShelves && (
+            <div className="shelf-card-add-to" ref={menuRef}>
+              <button
+                className="shelf-add-btn"
+                onClick={() => setShowShelfMenu((v) => !v)}
+                title="Add to another shelf"
+              >
+                + Shelf
+              </button>
+              {showShelfMenu && (
+                <div className="shelf-card-menu">
+                  {allShelves
+                    .filter((s) => s.id !== currentShelfId)
+                    .map((s) => (
+                      <button
+                        key={s.id}
+                        className="shelf-card-menu-item"
+                        onClick={() => {
+                          onAddToShelf(book.id, s.id);
+                          setShowShelfMenu(false);
+                        }}
+                      >
+                        {s.name}
+                      </button>
+                    ))}
+                  {allShelves.filter((s) => s.id !== currentShelfId).length === 0 && (
+                    <span className="shelf-card-menu-empty">No other shelves</span>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,6 +1,7 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const usersRepository = require('../repositories/usersRepository');
+const shelvesRepository = require('../repositories/shelvesRepository');
 
 const SALT_ROUNDS = 10;
 const JWT_SECRET = () => process.env.JWT_SECRET || 'dev_secret_change_in_production';
@@ -14,6 +15,8 @@ const register = async (username, password) => {
   }
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const id = await usersRepository.create({ username, passwordHash });
+  // Create the default Main Shelf for the new user
+  await shelvesRepository.createDefault(id);
   return buildTokenResponse({ id, username });
 };
 

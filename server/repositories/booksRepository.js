@@ -30,6 +30,23 @@ const findAll = async (userId, sortBy = 'date', sortDir = 'desc') => {
   return rows;
 };
 
+const findById = async (userId, id) => {
+  const [rows] = await pool.query(
+    'SELECT * FROM books WHERE id = ? AND user_id = ?',
+    [id, userId]
+  );
+  return rows[0] || null;
+};
+
+const deleteOrphans = async (userId) => {
+  await pool.query(
+    `DELETE FROM books WHERE user_id = ? AND id NOT IN (
+       SELECT book_id FROM book_shelves
+     )`,
+    [userId]
+  );
+};
+
 const findByExternalId = async (userId, externalId) => {
   const [rows] = await pool.query(
     'SELECT * FROM books WHERE user_id = ? AND external_id = ?',
@@ -55,4 +72,4 @@ const remove = async (userId, id) => {
   return result.affectedRows > 0;
 };
 
-module.exports = { findPopular, findAll, findByExternalId, create, remove };
+module.exports = { findPopular, findAll, findById, findByExternalId, create, remove, deleteOrphans };

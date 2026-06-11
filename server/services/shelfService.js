@@ -1,4 +1,5 @@
 const booksRepository = require('../repositories/booksRepository');
+const shelvesRepository = require('../repositories/shelvesRepository');
 
 const getPopular = async () => {
   const rows = await booksRepository.findPopular(10);
@@ -46,6 +47,12 @@ const saveBook = async (userId, book) => {
     coverUrl: book.cover,
     pages: book.pages,
   });
+
+  // Add to Main Shelf automatically
+  const mainShelf = await shelvesRepository.findDefault(userId);
+  if (mainShelf) {
+    await shelvesRepository.addBook(id, mainShelf.id);
+  }
 
   return { id, ...book };
 };

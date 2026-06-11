@@ -4,14 +4,18 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import Footer from './components/Footer';
 import SearchPage from './pages/SearchPage';
-import ShelfPage from './pages/ShelfPage';
+import ShelvesPage from './pages/ShelvesPage';
+import BuddiesPage from './pages/BuddiesPage';
+import BuddyShelvesPage from './pages/BuddyShelvesPage';
 import LoginPage from './pages/LoginPage';
 import LandingPage from './pages/LandingPage';
 import DashboardPage from './pages/DashboardPage';
 import AboutPage from './pages/AboutPage';
+import { useBuddies } from './hooks/useBuddies';
 
 function Nav() {
   const { user, logout } = useAuth();
+  const { incoming } = useBuddies(user?.id);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -29,7 +33,13 @@ function Nav() {
           {user ? (
             <>
               <NavLink to="/search" className={linkClass}>Search</NavLink>
-              <NavLink to="/shelf" className={linkClass}>My Shelf</NavLink>
+              <NavLink to="/shelves" className={linkClass}>My Shelves</NavLink>
+              <NavLink to="/buddies" className={({ isActive }) => `nav-link${isActive ? ' nav-link--active' : ''} nav-link--buddies`}>
+                Buddies
+                {incoming.length > 0 && (
+                  <span className="nav-badge">{incoming.length}</span>
+                )}
+              </NavLink>
               <NavLink to="/about" className={linkClass}>About</NavLink>
               <span className="nav-divider">|</span>
               <span className="nav-username">{user.username}</span>
@@ -61,8 +71,10 @@ function Layout() {
           <Route path="/"       element={<HomePage />} />
           <Route path="/about"  element={<AboutPage />} />
           <Route path="/login"  element={<LoginPage />} />
-          <Route path="/search" element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
-          <Route path="/shelf"  element={<ProtectedRoute><ShelfPage /></ProtectedRoute>} />
+          <Route path="/search"           element={<ProtectedRoute><SearchPage /></ProtectedRoute>} />
+          <Route path="/shelves"          element={<ProtectedRoute><ShelvesPage /></ProtectedRoute>} />
+          <Route path="/buddies"          element={<ProtectedRoute><BuddiesPage /></ProtectedRoute>} />
+          <Route path="/buddies/:username" element={<ProtectedRoute><BuddyShelvesPage /></ProtectedRoute>} />
         </Routes>
       </main>
       <Footer />
