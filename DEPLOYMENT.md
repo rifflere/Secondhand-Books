@@ -14,17 +14,33 @@ Use this when you've made code changes and want to push them to the live server.
 .\deploy\upload.ps1 -IP <YOUR_EC2_IP>
 ```
 
-Then SSH in and restart the server:
+Then SSH in:
 
 ```powershell
 ssh -i "$env:USERPROFILE\.ssh\secondhand-books" ec2-user@<YOUR_EC2_IP>
 ```
 
 ```bash
+cd /var/www/secondhand-books/server
+
+# Only needed when package.json changed (new npm dependency added):
+npm install --omit=dev
+
+# Only needed when init-db.js changed (new table or column added) — always safe to re-run:
+npm run db:init
+
+# Always required — restarts the Express server with the new code:
 pm2 restart secondhand-books
+
+# Always required after uploading a new frontend build — SCP resets file permissions
+# and nginx (running as the nginx user) will get "Permission denied" without this:
+sudo chmod -R o+rX /var/www/secondhand-books/client/dist
 ```
 
-That's it. Changes are live.
+Changes are live.
+
+> **Symptom if you skip the chmod:** the site returns `500 Internal Server Error` and
+> `sudo tail /var/log/nginx/error.log` shows `stat() failed (13: Permission denied)`.
 
 > Your EC2 IP is in `terraform/terraform.tfvars` or run `terraform output` from the `terraform/` folder.
 
