@@ -2172,3 +2172,201 @@ button, input {
   white-space: nowrap;
   margin-left: auto;
 }
+
+/* ==========================================================================
+   Recovery Section (Login Page)
+   ========================================================================== */
+.recover-section {
+  margin-top: 16px;
+  text-align: center;
+}
+.recover-toggle {
+  background: none;
+  border: none;
+  color: var(--c-primary);
+  font-size: 13px;
+  cursor: pointer;
+  text-decoration: underline;
+  font-family: var(--font);
+  padding: 0;
+}
+.recover-toggle:hover { color: var(--c-primary-hover); }
+
+.recover-panel {
+  margin-top: 14px;
+  padding: 16px;
+  background: var(--c-surface-alt);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  text-align: left;
+}
+.recover-type-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.recover-type-tab {
+  flex: 1;
+  padding: 6px 10px;
+  font-size: 12px;
+  font-family: var(--font);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-sm);
+  cursor: pointer;
+  color: var(--c-text);
+  transition: background 0.15s, color 0.15s;
+}
+.recover-type-tab:hover { background: var(--c-bg); }
+.recover-type-tab--active {
+  background: var(--c-header);
+  color: #fff;
+  border-color: var(--c-header);
+}
+.recover-form { display: flex; flex-direction: column; gap: 10px; }
+.recover-success {
+  color: #2d6a2d;
+  font-size: 13px;
+  background: #e8f5e8;
+  border: 1px solid #b8d8b8;
+  border-radius: var(--r-sm);
+  padding: 10px 12px;
+  margin: 0;
+}
+
+/* ==========================================================================
+   Reset Password Page
+   ========================================================================== */
+.reset-status { text-align: center; color: var(--c-muted); padding: 20px 0; }
+.reset-invalid, .reset-done {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 0;
+  text-align: center;
+  color: var(--c-text);
+}
+.reset-back-link {
+  display: inline-block;
+  text-decoration: none;
+}
+
+/* ==========================================================================
+   Account Page
+   ========================================================================== */
+.account-card {
+  display: flex;
+  gap: 20px;
+  align-items: center;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-xl);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+}
+.account-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: var(--c-header);
+  color: #fff;
+  font-size: 28px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.account-info { display: flex; flex-direction: column; gap: 4px; }
+.account-username { font-size: 22px; font-weight: 800; color: var(--c-header); margin: 0; }
+.account-since { font-size: 13px; color: var(--c-muted); margin: 0; }
+.account-affirmation {
+  font-size: 14px;
+  color: var(--c-dim);
+  font-style: italic;
+  margin-top: 4px;
+}
+
+.account-stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.account-stat {
+  flex: 1;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  border-radius: var(--r-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  box-shadow: var(--shadow-sm);
+}
+.account-stat-number { font-size: 28px; font-weight: 800; color: var(--c-primary); }
+.account-stat-label { font-size: 12px; color: var(--c-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+.account-danger-zone {
+  margin-top: 16px;
+  border: 1px solid #d4635e;
+  border-radius: var(--r-lg);
+  padding: 20px;
+  background: #fff8f8;
+}
+.account-danger-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #a03030;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 14px;
+}
+.account-delete-btn {
+  background: none;
+  border: 1px solid #c0392b;
+  color: #c0392b;
+  border-radius: var(--r-sm);
+  padding: 8px 16px;
+  font-family: var(--font);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.account-delete-btn:hover { background: #c0392b; color: #fff; }
+
+.account-delete-warning {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.account-delete-warning-text {
+  font-size: 14px;
+  color: var(--c-text);
+  line-height: 1.5;
+}
+.account-delete-confirm-label {
+  font-size: 13px;
+  color: var(--c-text);
+}
+.account-delete-confirm-input { max-width: 280px; }
+.account-delete-actions { display: flex; gap: 10px; align-items: center; }
+
+/* btn-secondary (used on recover form) */
+.btn-secondary {
+  background: var(--c-surface);
+  color: var(--c-header);
+  border: 2px solid var(--c-header);
+  border-radius: var(--r-md);
+  padding: 10px 20px;
+  font-family: var(--font);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.btn-secondary:hover { background: var(--c-header); color: #fff; }
+.btn-secondary:disabled { opacity: 0.55; cursor: not-allowed; }

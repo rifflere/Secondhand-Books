@@ -93,6 +93,28 @@ async function init() {
     )
   `);
 
+  // Migrate: add email column to users if not present
+  const [emailCol] = await conn.query(
+    `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'users' AND COLUMN_NAME = 'email'`,
+    [dbName]
+  );
+  if (emailCol.length === 0) {
+    await conn.query(`ALTER TABLE users ADD COLUMN email VARCHAR(255) UNIQUE NULL`);
+  }
+
+  await conn.query(`
+    CREATE TABLE IF NOT EXISTS password_reset_tokens (
+      id         INT AUTO_INCREMENT PRIMARY KEY,
+      user_id    INT NOT NULL,
+      token      CHAR(64) NOT NULL UNIQUE,
+      expires_at DATETIME NOT NULL,
+      used_at    DATETIME NULL,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    )
+  `);
+
   // Create Main Shelf for any user who doesn't have one yet
   await conn.query(`
     INSERT IGNORE INTO shelves (user_id, name, is_public, is_default)

@@ -5,12 +5,21 @@ const findByUsername = async (username) => {
   return rows[0] || null;
 };
 
-const create = async ({ username, passwordHash }) => {
+const create = async ({ username, passwordHash, email }) => {
   const [result] = await pool.query(
-    'INSERT INTO users (username, password_hash) VALUES (?, ?)',
-    [username, passwordHash]
+    'INSERT INTO users (username, password_hash, email) VALUES (?, ?, ?)',
+    [username, passwordHash, email || null]
   );
   return result.insertId;
+};
+
+const findByEmail = async (email) => {
+  const [rows] = await pool.query('SELECT * FROM users WHERE email = ?', [email]);
+  return rows[0] || null;
+};
+
+const updatePassword = async (userId, passwordHash) => {
+  await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [passwordHash, userId]);
 };
 
 const findPublicByUsername = async (username) => {
@@ -41,4 +50,4 @@ const searchByUsername = async (query, currentUserId) => {
   return rows;
 };
 
-module.exports = { findByUsername, findPublicByUsername, searchByUsername, create };
+module.exports = { findByUsername, findPublicByUsername, searchByUsername, create, findByEmail, updatePassword };
