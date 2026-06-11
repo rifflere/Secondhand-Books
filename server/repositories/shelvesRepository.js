@@ -31,7 +31,7 @@ const findPublicByUser = async (userId) => {
     `SELECT s.*, COUNT(bs.book_id) AS book_count
      FROM shelves s
      LEFT JOIN book_shelves bs ON bs.shelf_id = s.id
-     WHERE s.user_id = ? AND (s.is_default = TRUE OR s.is_public = TRUE)
+     WHERE s.user_id = ? AND s.is_public = TRUE
      GROUP BY s.id
      ORDER BY s.is_default DESC, s.created_at ASC`,
     [userId]

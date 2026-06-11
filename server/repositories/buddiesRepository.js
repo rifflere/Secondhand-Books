@@ -101,7 +101,7 @@ const findFeed = async (userId, limit = 20) => {
        FROM friendships
        WHERE (requester_id = ? OR receiver_id = ?) AND status = 'accepted'
      )
-     AND (s.is_default = TRUE OR s.is_public = TRUE)
+     AND s.is_public = TRUE
      ORDER BY bs.added_at DESC
      LIMIT ?`,
     [userId, userId, userId, limit]

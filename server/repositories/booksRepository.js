@@ -10,8 +10,13 @@ const findPopular = async (limit = 10) => {
        MAX(cover_url)        AS cover_url,
        MAX(pages)            AS pages,
        COUNT(*)              AS save_count
-     FROM books
+     FROM books b
      WHERE external_id IS NOT NULL
+       AND EXISTS (
+         SELECT 1 FROM book_shelves bs
+         JOIN shelves s ON s.id = bs.shelf_id
+         WHERE bs.book_id = b.id AND s.is_public = TRUE
+       )
      GROUP BY external_id
      ORDER BY save_count DESC
      LIMIT ?`,
