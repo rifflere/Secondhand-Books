@@ -34,11 +34,14 @@ const list = async (req, res, next) => {
 
 const save = async (req, res, next) => {
   try {
-    const { title, author, year, cover, pages, olKey } = req.body;
+    const { title, author, year, cover, pages, olKey, shelfId } = req.body;
     if (!title) {
       return res.status(400).json({ error: 'Title is required' });
     }
-    const book = await shelfService.saveBook(req.user.id, { title, author, year, cover, pages, olKey });
+    const book = await shelfService.saveBook(req.user.id, {
+      title, author, year, cover, pages, olKey,
+      shelfId: shelfId ? parseInt(shelfId, 10) : null,
+    });
     res.status(201).json(book);
   } catch (err) {
     if (err.status) return res.status(err.status).json({ error: err.message });

@@ -1,24 +1,30 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BookCard from '../components/BookCard';
 import { useSearch } from '../hooks/useSearch';
 import { usePopular } from '../hooks/usePopular';
 import { saveBook } from '../services/bookService';
+import { listShelves } from '../services/shelvesService';
 
 export default function SearchPage() {
   const { query, setQuery, results, loading, error, search } = useSearch();
   const { books: popular, loading: popularLoading } = usePopular();
   const [saveStatuses, setSaveStatuses] = useState({});
+  const [shelves, setShelves] = useState([]);
+
+  useEffect(() => {
+    listShelves().then(setShelves).catch(() => {});
+  }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     search();
   };
 
-  const handleSave = async (book) => {
+  const handleSave = async (book, shelfId) => {
     const key = book.olKey || book.title;
     setSaveStatuses((prev) => ({ ...prev, [key]: 'saving' }));
     try {
-      await saveBook(book);
+      await saveBook(book, shelfId);
       setSaveStatuses((prev) => ({ ...prev, [key]: 'saved' }));
     } catch (err) {
       const serverError = err.response?.data?.error;
@@ -62,6 +68,7 @@ export default function SearchPage() {
                   onSave={handleSave}
                   saveStatus={saveStatuses[key]}
                   saveCount={book.saveCount}
+                  shelves={shelves}
                 />
               );
             })}
@@ -85,6 +92,7 @@ export default function SearchPage() {
                 book={book}
                 onSave={handleSave}
                 saveStatus={saveStatuses[key]}
+                shelves={shelves}
               />
             );
           })}

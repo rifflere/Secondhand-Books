@@ -1,16 +1,49 @@
-import React from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 
-const SAVE_LABEL = {
-  saving:    'Saving…',
-  saved:     'Saved ✓',
-  duplicate: 'Already on shelf',
-  error:     'Retry',
-};
-
-export default function BookCard({ book, onSave, saveStatus, saveCount }) {
+export default function BookCard({ book, onSave, saveStatus, saveCount, shelves }) {
   const { title, author, year, cover, pages } = book;
+  const [showPicker, setShowPicker] = useState(false);
+  const pickerRef = useRef(null);
+
   const status = saveStatus || 'default';
-  const isDisabled = status === 'saving' || status === 'saved' || status === 'duplicate';
+  const isSettled = status === 'saved' || status === 'duplicate';
+
+  // Close picker when status resolves (saved / error) or on outside click
+  useEffect(() => {
+    if (status !== 'default') setShowPicker(false);
+  }, [status]);
+
+  useEffect(() => {
+    if (!showPicker) return;
+    const handler = (e) => {
+      if (pickerRef.current && !pickerRef.current.contains(e.target)) {
+        setShowPicker(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [showPicker]);
+
+  const handleSaveClick = () => {
+    if (isSettled || status === 'saving') return;
+    if (shelves && shelves.length > 0) {
+      setShowPicker(true);
+    } else {
+      onSave(book);
+    }
+  };
+
+  const handlePickShelf = (shelfId) => {
+    setShowPicker(false);
+    onSave(book, shelfId);
+  };
+
+  const saveLabel = {
+    saving:    'Saving…',
+    saved:     'Saved ✓',
+    duplicate: 'Already saved',
+    error:     'Retry',
+  }[status] ?? 'Save to Shelf';
 
   return (
     <div className="book-card">
@@ -42,14 +75,38 @@ export default function BookCard({ book, onSave, saveStatus, saveCount }) {
       </div>
 
       {onSave && (
-        <div className="book-card-actions">
-          <button
-            className={`save-btn save-btn--${status}`}
-            onClick={() => !isDisabled && onSave(book)}
-            disabled={isDisabled}
-          >
-            {SAVE_LABEL[status] ?? 'Save to Shelf'}
-          </button>
+        <div className="book-card-actions" ref={pickerRef}>
+          {showPicker ? (
+            <div className="book-shelf-picker">
+              <span className="book-shelf-picker-label">Add to:</span>
+              <div className="book-shelf-picker-list">
+                {shelves.map((s) => (
+                  <button
+                    key={s.id}
+                    className="book-shelf-pick-btn"
+                    onClick={() => handlePickShelf(s.id)}
+                  >
+                    {s.name}
+                  </button>
+                ))}
+              </div>
+              <button
+                className="book-shelf-pick-cancel"
+                onClick={() => setShowPicker(false)}
+                aria-label="Cancel"
+              >
+                ✕
+              </button>
+            </div>
+          ) : (
+            <button
+              className={`save-btn save-btn--${status}`}
+              onClick={handleSaveClick}
+              disabled={isSettled || status === 'saving'}
+            >
+              {saveLabel}
+            </button>
+          )}
         </div>
       )}
     </div>

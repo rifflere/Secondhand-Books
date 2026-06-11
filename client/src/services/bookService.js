@@ -18,8 +18,8 @@ export const getShelf = async (sort, dir) => {
   return data;
 };
 
-export const saveBook = async (book) => {
-  const { data } = await api.post('/books', book);
+export const saveBook = async (book, shelfId) => {
+  const { data } = await api.post('/books', { ...book, shelfId: shelfId ?? undefined });
   return data;
 };
 

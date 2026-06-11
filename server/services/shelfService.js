@@ -48,10 +48,17 @@ const saveBook = async (userId, book) => {
     pages: book.pages,
   });
 
-  // Add to Main Shelf automatically
-  const mainShelf = await shelvesRepository.findDefault(userId);
-  if (mainShelf) {
-    await shelvesRepository.addBook(id, mainShelf.id);
+  // Add to the requested shelf, falling back to Main Shelf
+  let targetShelf = null;
+  if (book.shelfId) {
+    const s = await shelvesRepository.findById(book.shelfId);
+    if (s && s.user_id === userId) targetShelf = s;
+  }
+  if (!targetShelf) {
+    targetShelf = await shelvesRepository.findDefault(userId);
+  }
+  if (targetShelf) {
+    await shelvesRepository.addBook(id, targetShelf.id);
   }
 
   return { id, ...book };
