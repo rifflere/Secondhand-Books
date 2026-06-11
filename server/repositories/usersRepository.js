@@ -18,6 +18,21 @@ const findByEmail = async (email) => {
   return rows[0] || null;
 };
 
+const findAll = async () => {
+  const [rows] = await pool.query(
+    `SELECT u.id, u.username, u.created_at, u.is_admin,
+       (SELECT COUNT(*) FROM books   b WHERE b.user_id = u.id) AS book_count,
+       (SELECT COUNT(*) FROM shelves s WHERE s.user_id = u.id) AS shelf_count
+     FROM users u
+     ORDER BY u.created_at ASC`
+  );
+  return rows;
+};
+
+const setAdmin = async (userId, isAdmin) => {
+  await pool.query('UPDATE users SET is_admin = ? WHERE id = ?', [isAdmin ? 1 : 0, userId]);
+};
+
 const updatePassword = async (userId, passwordHash) => {
   await pool.query('UPDATE users SET password_hash = ? WHERE id = ?', [passwordHash, userId]);
 };
@@ -50,4 +65,4 @@ const searchByUsername = async (query, currentUserId) => {
   return rows;
 };
 
-module.exports = { findByUsername, findPublicByUsername, searchByUsername, create, findByEmail, updatePassword };
+module.exports = { findByUsername, findPublicByUsername, searchByUsername, create, findByEmail, updatePassword, findAll, setAdmin };

@@ -7,6 +7,7 @@ const shelvesRouter = require('./routes/shelves');
 const buddiesRouter = require('./routes/buddies');
 const usersRouter = require('./routes/users');
 const accountRouter = require('./routes/account');
+const adminRouter = require('./routes/admin');
 const errorHandler = require('./middleware/errorHandler');
 
 const app = express();
@@ -21,6 +22,7 @@ app.use('/api/shelves', shelvesRouter);
 app.use('/api/buddies', buddiesRouter);
 app.use('/api/users', usersRouter);
 app.use('/api/account', accountRouter);
+app.use('/api/admin', adminRouter);
 app.use(errorHandler);
 
 app.listen(PORT, () => {

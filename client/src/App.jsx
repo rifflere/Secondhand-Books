@@ -13,6 +13,7 @@ import DashboardPage from './pages/DashboardPage';
 import AboutPage from './pages/AboutPage';
 import AccountPage from './pages/AccountPage';
 import ResetPasswordPage from './pages/ResetPasswordPage';
+import AdminPage from './pages/AdminPage';
 import { useBuddies } from './hooks/useBuddies';
 
 function Nav() {
@@ -43,6 +44,9 @@ function Nav() {
                 )}
               </NavLink>
               <NavLink to="/about" className={linkClass}>About</NavLink>
+              {user.isAdmin && (
+                <NavLink to="/admin" className={() => 'nav-link nav-link--admin'}>Admin</NavLink>
+              )}
               <span className="nav-divider">|</span>
               <NavLink to="/account" className={linkClass}>{user.username}</NavLink>
               <button className="nav-signout" onClick={handleLogout}>Sign out</button>
@@ -78,6 +82,7 @@ function Layout() {
           <Route path="/buddies"          element={<ProtectedRoute><BuddiesPage /></ProtectedRoute>} />
           <Route path="/buddies/:username" element={<ProtectedRoute><BuddyShelvesPage /></ProtectedRoute>} />
           <Route path="/account"           element={<ProtectedRoute><AccountPage /></ProtectedRoute>} />
+          <Route path="/admin"             element={<ProtectedRoute><AdminPage /></ProtectedRoute>} />
           <Route path="/reset-password"    element={<ResetPasswordPage />} />
         </Routes>
       </main>

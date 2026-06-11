@@ -93,6 +93,16 @@ async function init() {
     )
   `);
 
+  // Migrate: add is_admin column to users if not present
+  const [adminCol] = await conn.query(
+    `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS
+     WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'users' AND COLUMN_NAME = 'is_admin'`,
+    [dbName]
+  );
+  if (adminCol.length === 0) {
+    await conn.query(`ALTER TABLE users ADD COLUMN is_admin BOOLEAN NOT NULL DEFAULT FALSE`);
+  }
+
   // Migrate: add email column to users if not present
   const [emailCol] = await conn.query(
     `SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS

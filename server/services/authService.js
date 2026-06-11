@@ -26,7 +26,7 @@ const register = async (username, password, email) => {
   const passwordHash = await bcrypt.hash(password, SALT_ROUNDS);
   const id = await usersRepository.create({ username, passwordHash, email });
   await shelvesRepository.createDefault(id);
-  return buildTokenResponse({ id, username });
+  return buildTokenResponse({ id, username, isAdmin: false });
 };
 
 const login = async (username, password) => {
@@ -37,7 +37,7 @@ const login = async (username, password) => {
     err.status = 401;
     throw err;
   }
-  return buildTokenResponse({ id: user.id, username: user.username });
+  return buildTokenResponse({ id: user.id, username: user.username, isAdmin: Boolean(user.is_admin) });
 };
 
 const recoverUsername = async (email) => {
@@ -83,12 +83,13 @@ const resetPassword = async (token, newPassword) => {
 };
 
 const buildTokenResponse = (user) => {
+  const isAdmin = Boolean(user.isAdmin);
   const token = jwt.sign(
-    { id: user.id, username: user.username },
+    { id: user.id, username: user.username, isAdmin },
     JWT_SECRET(),
     { expiresIn: '7d' }
   );
-  return { token, user: { id: user.id, username: user.username } };
+  return { token, user: { id: user.id, username: user.username, isAdmin } };
 };
 
 module.exports = { register, login, recoverUsername, requestPasswordReset, validateResetToken, resetPassword };
