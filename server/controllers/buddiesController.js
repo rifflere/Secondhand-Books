@@ -2,12 +2,15 @@ const buddiesService = require('../services/buddiesService');
 
 const search = async (req, res, next) => {
   try {
-    res.json(await buddiesService.searchUsers(req.query.q || '', req.user.id));
+    const q = req.query.q;
+    if (!q || !q.trim()) return res.status(400).json({ error: 'Search query required' });
+    res.json(await buddiesService.searchUsers(q, req.user.id));
   } catch (err) { next(err); }
 };
 
 const sendRequest = async (req, res, next) => {
   try {
+    if (!req.body.username) return res.status(400).json({ error: 'Username is required' });
     const result = await buddiesService.sendRequest(req.user.id, req.body.username);
     res.status(201).json(result);
   } catch (err) {

@@ -42,9 +42,8 @@ const sendRequest = async (fromUserId, toUsername) => {
 
 const respondToRequest = async (requestId, userId, action) => {
   const req = await buddiesRepo.findById(requestId);
-  if (!req || req.receiver_id !== userId) {
-    throw Object.assign(new Error('Request not found'), { status: 404 });
-  }
+  if (!req) throw Object.assign(new Error('Request not found'), { status: 404 });
+  if (req.receiver_id !== userId) throw Object.assign(new Error('Access denied'), { status: 403 });
   if (req.status !== 'pending') {
     throw Object.assign(new Error('Request already handled'), { status: 409 });
   }

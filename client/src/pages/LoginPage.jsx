@@ -84,12 +84,14 @@ export default function LoginPage() {
 
         <div className="login-tabs">
           <button
+            type="button"
             className={`login-tab${mode === 'login' ? ' login-tab--active' : ''}`}
             onClick={() => switchMode('login')}
           >
             Sign In
           </button>
           <button
+            type="button"
             className={`login-tab${mode === 'register' ? ' login-tab--active' : ''}`}
             onClick={() => switchMode('register')}
           >
@@ -99,8 +101,9 @@ export default function LoginPage() {
 
         <form className="login-form" onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">Username</label>
+            <label className="form-label" htmlFor="login-username">Username</label>
             <input
+              id="login-username"
               className="form-input"
               type="text"
               value={username}
@@ -112,10 +115,11 @@ export default function LoginPage() {
 
           {mode === 'register' && (
             <div className="form-group">
-              <label className="form-label">
+              <label className="form-label" htmlFor="login-email">
                 Email <span className="form-label-hint">(for account recovery only)</span>
               </label>
               <input
+                id="login-email"
                 className="form-input"
                 type="email"
                 value={email}
@@ -127,13 +131,14 @@ export default function LoginPage() {
           )}
 
           <div className="form-group">
-            <label className="form-label">
+            <label className="form-label" htmlFor="login-password">
               Password{' '}
               {mode === 'register' && (
                 <span className="form-label-hint">(min. 6 characters)</span>
               )}
             </label>
             <input
+              id="login-password"
               className="form-input"
               type="password"
               value={password}
@@ -185,8 +190,9 @@ export default function LoginPage() {
                   <form className="recover-form" onSubmit={handleRecover}>
                     {recoverType === 'password' && (
                       <div className="form-group">
-                        <label className="form-label">Username</label>
+                        <label className="form-label" htmlFor="recover-username">Username</label>
                         <input
+                          id="recover-username"
                           className="form-input"
                           type="text"
                           value={recoverUsername}
@@ -197,8 +203,9 @@ export default function LoginPage() {
                       </div>
                     )}
                     <div className="form-group">
-                      <label className="form-label">Email address</label>
+                      <label className="form-label" htmlFor="recover-email">Email address</label>
                       <input
+                        id="recover-email"
                         className="form-input"
                         type="email"
                         value={recoverEmail}
