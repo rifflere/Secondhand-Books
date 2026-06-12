@@ -121,6 +121,102 @@ On the Sign In page, click **Forgot username or password?** to expand the recove
 
 ---
 
+## Agentic Development
+
+This project includes a documentation harness and a set of Claude Code slash commands for building features with AI assistance. If you're new to agentic coding, read this section first.
+
+### How it works
+
+Feature development follows a five-stage loop:
+
+```
+/spec  →  /critique  →  /plan  →  /build  →  /validate  →  /ship
+```
+
+`/critique` can be used at any stage — after a spec, after a plan, or against recent code changes. It's intentionally adversarial: it looks for scope creep, constitution violations, privacy leaks, missing failure modes, and weak tests.
+
+Each stage produces a file that the next stage reads. Nothing is thrown away — the spec, plan, and test results all live in `docs/features/`.
+
+### The docs folder
+
+```
+docs/
+  product.md          What the product is, who it's for, what's out of scope
+  tech.md             Stack, directory layout, backend/frontend patterns, DB schema
+  constitution.md     Hard constraints — rules that must never be broken
+  features/
+    0001-auth/        One folder per feature, numbered in order
+      spec.md         What to build (behavior, data model, API, tests to write)
+      plan.md         How to build it (step-by-step, file by file)
+    0002-books/
+    0003-shelves/
+    ...
+```
+
+Start a new session by pointing Claude at the relevant docs: "Read docs/product.md, docs/tech.md, and docs/features/0003-shelves/spec.md, then help me..."
+
+### Slash commands
+
+These commands live in `.claude/commands/` and are available in Claude Code when you type `/`.
+
+| Command | What it does |
+|---------|-------------|
+| `/spec [idea]` | Asks you clarifying questions and writes a spec to `docs/features/NNNN-name/spec.md` |
+| `/plan [NNNN-name]` | Reads the spec and writes a step-by-step implementation plan |
+| `/build [NNNN-name]` | Implements the plan, running tests incrementally as it goes |
+| `/validate` | Runs all backend + frontend tests and reports pass/fail |
+| `/ship [message]` | Runs tests; if green, creates a conventional commit |
+| `/critique [NNNN-name]` | Adversarial review — pushes back on specs, plans, or recent code before you commit to them |
+
+### Starting a new feature — step by step
+
+**1. Discuss and spec**
+```
+/spec I want to add reading lists — a way to tag books as "want to read" vs "have read"
+```
+Claude will ask questions, then write `docs/features/0007-reading-lists/spec.md`. Review and edit the file directly if anything's off.
+
+**2. Plan**
+```
+/plan 0007-reading-lists
+```
+Claude reads the spec + `docs/tech.md` + relevant existing files, then writes a step-by-step plan to `docs/features/0007-reading-lists/plan.md`. Read the plan before proceeding — this is your last cheap chance to catch scope creep.
+
+**3. Build**
+```
+/build 0007-reading-lists
+```
+Claude implements the plan layer by layer (DB → repo → service → controller → route → frontend → tests), running tests after each layer.
+
+**4. Validate**
+```
+/validate
+```
+Runs both test suites and shows a clean pass/fail summary.
+
+**5. Commit**
+```
+/ship feat: add reading list status to books
+```
+Runs tests one more time, stages the changes, and creates a conventional commit. Does not push.
+
+### Tips for working with Claude
+
+- **Share context explicitly.** At the start of a new session, say: "Read docs/product.md and docs/tech.md, then we'll work on X." Claude doesn't remember previous sessions.
+- **Review specs and plans before building.** The spec is cheap to change; the plan is slightly less cheap; the code is expensive.
+- **One feature at a time.** Keep feature folders small. If a spec is getting complex, split it.
+- **Trust the tests.** `/build` won't mark a step done if the tests fail. Don't skip this.
+- **The constitution is the safety net.** If Claude proposes something that would violate `docs/constitution.md` (e.g., skipping a layer, or using `is_default` as a privacy gate), point to the relevant rule.
+
+### Running tests manually
+
+```powershell
+cd server && npm test           # Jest — backend, 87 tests
+cd client && npx vitest run    # Vitest — frontend, 40 tests
+```
+
+---
+
 ## Local Setup
 
 ### Prerequisites
